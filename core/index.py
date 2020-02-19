@@ -39,3 +39,6 @@ for imgs, ids in data_loader:
         indexed_ids.extend(ids)
 
 joblib.dump((indexed_ids, indexed_vectors), 'vectors.pkl')
+
+
+
