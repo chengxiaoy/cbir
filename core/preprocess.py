@@ -56,7 +56,7 @@ def image_loader(image_name):
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ]
         )
-        image = loader(im).unsqueeze(0)
+        image = loader(im)
         images.append(image)
     return images[0]
 
