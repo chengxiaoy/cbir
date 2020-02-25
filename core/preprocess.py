@@ -26,9 +26,10 @@ class DirDataset(Dataset):
     the id is the file name, the file under the dir is all need collected in to the dataset
     """
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, nums):
         super(DirDataset, self).__init__()
         self.root_dir = root_dir
+        self.nums = nums
         self.image_paths = self.get_image_paths(self.root_dir)
 
     def __getitem__(self, index):
@@ -49,16 +50,17 @@ class DirDataset(Dataset):
                 image_path_list.append(file)
             else:
                 image_path_list.extend(self.get_image_paths(file))
-        return image_path_list
+        return image_path_list[:self.nums]
 
 
-def get_dataset(root_dir):
+def get_dataset(root_dir, nums):
     """
     get the dataset of the iamges under the root_dir
+    :param nums:
     :param root_dir:
     :return:
     """
-    return DirDataset(root_dir)
+    return DirDataset(root_dir, nums)
 
 
 def collate_tuples(batch):

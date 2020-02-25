@@ -11,6 +11,7 @@ import time
 parser = argparse.ArgumentParser(description="index images")
 
 parser.add_argument("--dir", '-d', default="../test/", required=False, help="the dir need to be indexed")
+parser.add_argument("--num", '-n', default=100000, required=False)
 parser.add_argument("--encoder", '-e', default='mac', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
@@ -23,7 +24,7 @@ parser.add_argument("--model", '-m', default='resnet50', required=False,
 args = parser.parse_args()
 print(json.dumps(args.__dict__))
 model = get_model(args.model)
-data_set = get_dataset(args.dir)
+data_set = get_dataset(args.dir,args.num)
 data_loader = get_dataloader(data_set)
 
 indexed_vectors = []
@@ -43,6 +44,3 @@ for imgs, ids in data_loader:
         print("cost {} s".format(time.time() - since))
 
 joblib.dump((indexed_ids, indexed_vectors), '../vectors.pkl')
-
-
-
