@@ -72,7 +72,7 @@ class Hew(nn.Module):
 
     def forward(self, x):
         mean = joblib.load('hew_means.pkl')
-        x = x.detach().numpy()
+        x = x.detach().cpu().numpy()
         return torch.Tensor(LF.weight_Heat(x, mean)).float()
 
 
@@ -105,12 +105,12 @@ class Rpool(nn.Module):
         o = torch.squeeze(o, -1)
         if aggregate == 'sum':
             # rvecs -> sumpool -> norm
-            o = normalize(np.sum(o.detach().numpy(), axis=0).reshape(1, -1))
+            o = normalize(np.sum(o.detach().cpu().numpy(), axis=0).reshape(1, -1))
         elif aggregate == 'gmm':
-            o = LF.gmm(o.detach().numpy())
+            o = LF.gmm(o.detach().cpu().numpy())
             o = normalize(o)
         elif aggregate == 'gmp':
-            o = LF.gmp(o.detach().numpy().T)
+            o = LF.gmp(o.detach().cpu().numpy().T)
             o = normalize(o.reshape(1, -1))
         return o
 

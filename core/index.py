@@ -15,7 +15,7 @@ parser.add_argument("--num", '-n', default=100000, required=False)
 parser.add_argument("--encoder", '-e', default='mac', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
-parser.add_argument("--aggregate", '-a', default='gmp', required=False, choices=['sum', 'gmm', 'gmp'])
+parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_false', help="region pool")
 parser.add_argument("--model", '-m', default='resnet50', required=False,
                     choices=['resnet50', 'dla34', 'eff_net', 'attention'],

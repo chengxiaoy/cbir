@@ -4,6 +4,9 @@ from core.models.dlav0 import dla34
 from torch import nn
 import torch
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
 models = {
     "resnet50": nn.Sequential(*list(resnet50(True).children())[:-2]),
     "eff-net": nn.Sequential(*list(EfficientNet.from_pretrained('efficientnet-b0').children())[:-2]),

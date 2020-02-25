@@ -3,6 +3,8 @@ import os
 from torchvision.transforms import transforms
 import sys
 from PIL import Image
+import numpy as np
+
 
 # normalize = transforms.Normalize()
 transform = transforms.Compose([
@@ -10,6 +12,30 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     # normalize,
 ])
+
+
+def image_loader(image_name):
+    im = Image.open(image_name)
+    im = im.convert('RGB')
+    im_size_hw = np.array(im.size[::-1])
+
+    max_side_lengths = [550, 800, 1050]
+    images = []
+    for max_side_length in max_side_lengths:
+        ratio = float(max_side_length) / np.max(im_size_hw)
+        new_size = tuple(np.round(im_size_hw * ratio.astype(float)).astype(np.int32))
+        # fake batch dimension required to fit network's input dimensions
+        loader = transforms.Compose(
+            [
+                # transforms.Grayscale(num_output_channels=3),
+                transforms.Resize(new_size),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ]
+        )
+        image = loader(im).unsqueeze(0)
+        images.append(image)
+    return images
 
 
 def get_transform():
