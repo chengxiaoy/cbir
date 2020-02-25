@@ -173,7 +173,6 @@ def gmp(matrix, lamb=10, cgd=False):
     :param lamb: need cross valid(10, 100, 1000, 10000)
     :return:
     """
-    since = time.time()
     D, N = matrix.shape
     if not cgd:
         inv_matrix = np.linalg.inv(np.dot(matrix, np.transpose(matrix)) + lamb * np.diag([1] * D)).astype(np.float32)
@@ -181,7 +180,6 @@ def gmp(matrix, lamb=10, cgd=False):
         inv_matrix = cg(np.dot(matrix, np.transpose(matrix)) + lamb * np.diag([1] * D), np.diag([1] * D))
 
     gmp = np.dot(np.dot(inv_matrix, matrix), np.array([1] * N).T)
-    print("cost {} s".format(time.time() - since))
 
     return gmp
 
