@@ -5,7 +5,6 @@ import sys
 from PIL import Image
 import numpy as np
 
-
 # normalize = transforms.Normalize()
 transform = transforms.Compose([
     # transforms.ToPILImage(),
@@ -14,7 +13,7 @@ transform = transforms.Compose([
 ])
 
 
-def image_loader(image_name):
+def image_loader_ms(image_name):
     im = Image.open(image_name)
     im = im.convert('RGB')
     im_size_hw = np.array(im.size[::-1])
@@ -38,13 +37,37 @@ def image_loader(image_name):
     return images
 
 
+def image_loader(image_name):
+    im = Image.open(image_name)
+    im = im.convert('RGB')
+    im_size_hw = np.array(im.size[::-1])
+
+    max_side_lengths = [800]
+    images = []
+    for max_side_length in max_side_lengths:
+        ratio = float(max_side_length) / np.max(im_size_hw)
+        new_size = tuple(np.round(im_size_hw * ratio.astype(float)).astype(np.int32))
+        # fake batch dimension required to fit network's input dimensions
+        loader = transforms.Compose(
+            [
+
+                transforms.Resize(new_size),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ]
+        )
+        image = loader(im).unsqueeze(0)
+        images.append(image)
+    return images[0]
+
+
 def get_transform():
     """
     transform the image
     :param image: the pillow format
     :return:
     """
-    return transform
+    return image_loader
 
 
 class DirDataset(Dataset):
@@ -62,7 +85,7 @@ class DirDataset(Dataset):
         image_path = self.image_paths[index]
         image_id = image_path.split("/")[-1].split(".")[0]
         trans = get_transform()
-        return trans(Image.open(image_path).convert("RGB")), image_id
+        return trans(image_path), image_id
 
     def __len__(self):
         return len(self.image_paths)
