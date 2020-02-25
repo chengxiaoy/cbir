@@ -13,4 +13,4 @@ lines = [[int(x.split(',')[0]), x.split(',')[1].strip('"')] for x in lines[1:]]
 pool_num = 50
 pool = Pool(pool_num)
 
-pool.map(download_csvline, list(lines))
+pool.map(download_csvline, list(lines)[:100000])
