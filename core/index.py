@@ -6,12 +6,14 @@ from core.encode import get_feature_map, extract_vector
 import joblib
 import json
 from sklearn.preprocessing import normalize
+import torch
 import time
 
 parser = argparse.ArgumentParser(description="index images")
 
 parser.add_argument("--dir", '-d', default="../test/", required=False, help="the dir need to be indexed")
 parser.add_argument("--num", '-n', default=100000, required=False)
+parser.add_argument("--gpu", '-g', default=0, choices=[0, 1])
 parser.add_argument("--encoder", '-e', default='mac', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
@@ -23,8 +25,11 @@ parser.add_argument("--model", '-m', default='resnet50', required=False,
 
 args = parser.parse_args()
 print(json.dumps(args.__dict__))
+device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+
 model = get_model(args.model)
-data_set = get_dataset(args.dir,args.num)
+model = model.to(device)
+data_set = get_dataset(args.dir, args.num)
 data_loader = get_dataloader(data_set)
 
 indexed_vectors = []
@@ -32,6 +37,7 @@ indexed_ids = []
 
 for imgs, ids in data_loader:
     for id, img in zip(ids, imgs):
+        img = img.to(device)
         since = time.time()
 
         fm = get_feature_map(img, model)

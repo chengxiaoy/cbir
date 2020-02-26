@@ -4,7 +4,6 @@ from core.models.dlav0 import dla34
 from torch import nn
 import torch
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 models = {

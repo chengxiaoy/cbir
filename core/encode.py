@@ -1,6 +1,7 @@
 from core.layers.pooling import MAC, RMAC, SPoC, GeM, Rpool, Hew
 import torch
 
+
 POOLING = {
     'mac': MAC,
     'spoc': SPoC,
