@@ -37,16 +37,19 @@ indexed_ids = []
 
 for imgs, ids in data_loader:
     for id, img in zip(ids, imgs):
-        img = img.to(device)
-        since = time.time()
+        try:
+            img = img.to(device)
+            since = time.time()
 
-        fm = get_feature_map(img, model)
-        vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
-        # vectors = normalize(vectors)
+            fm = get_feature_map(img, model)
+            vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
+            # vectors = normalize(vectors)
 
-        ids = [id] * len(vectors)
-        indexed_vectors.extend(vectors)
-        indexed_ids.extend(ids)
-        print("cost {} s".format(time.time() - since))
+            ids = [id] * len(vectors)
+            indexed_vectors.extend(vectors)
+            indexed_ids.extend(ids)
+            print("cost {} s".format(time.time() - since))
+        except Exception as e:
+            print(e)
 
 joblib.dump((indexed_ids, indexed_vectors), '../vectors.pkl')
