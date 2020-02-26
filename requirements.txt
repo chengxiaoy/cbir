@@ -1,6 +1,6 @@
 pymysql
 flask
-faiss-gpu
+faiss
 scipy
 pillow==4.2.1
 grpcio
