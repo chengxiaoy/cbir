@@ -4,6 +4,7 @@ from torchvision.transforms import transforms
 import sys
 from PIL import Image
 import numpy as np
+import torch
 
 # normalize = transforms.Normalize()
 transform = transforms.Compose([
@@ -82,10 +83,12 @@ class DirDataset(Dataset):
         self.image_paths = self.get_image_paths(self.root_dir)
 
     def __getitem__(self, index):
-        image_path = self.image_paths[index]
-        image_id = image_path.split("/")[-1].split(".")[0]
-        trans = get_transform()
-        return trans(image_path), image_id
+        try:
+            image_path = self.image_paths[index]
+            trans = get_transform()
+            return trans(image_path), image_path
+        except Exception as e:
+            return torch.zeros(0), "error_path"
 
     def __len__(self):
         return len(self.image_paths)

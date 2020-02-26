@@ -35,9 +35,12 @@ data_loader = get_dataloader(data_set)
 indexed_vectors = []
 indexed_ids = []
 
-for imgs, ids in data_loader:
-    for id, img in zip(ids, imgs):
+for imgs, paths in data_loader:
+    for path, img in zip(paths, imgs):
         try:
+            if path == 'error_path':
+                print("get {} image feature failed!".format(path))
+                continue
             img = img.to(device)
             since = time.time()
 
