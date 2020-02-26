@@ -2,8 +2,101 @@ from core.layers.functional import weight_Heat
 import numpy as np
 from core.layers.functional import get_potential_inv_re
 
+import numpy as np
+from scipy import io
+from PIL import Image
+from time import time
+from sklearn import preprocessing
+import joblib
+import cv2
+import matplotlib.pyplot as plt
+import os
+from core.rerank import get_rerank_score, get_rerank_score_multiprocess
+from sklearn.preprocessing import normalize as sknormalize
+from config.config import *
+import faiss
+import logging
+from lib.log import log
+from core.helper import extract
+from core.preprocess import get_transform
 
 
+class Search:
+
+    def __init__(self, model, features_path, pca_path, device, args):
+        self.model = model
+        self.features, self.paths = joblib.load(features_path)
+        self.features = self.features.astype(np.float32)
+        self.features = self.normalize(self.features)
+        self.pca = joblib.load(pca_path)
+        self.device = device
+        self.args = args
+        self.invert_index = self.get_invert_index(feature=self.features)
+
+    def get_invert_index(self, feature):
+        nlist = 2000
+        d = len(feature[0])
+        quantizer = faiss.IndexFlatL2(d)  # the other index
+        index = faiss.IndexIVFFlat(quantizer, d, nlist, faiss.METRIC_L2)
+        # here we specify METRIC_L2, by default it performs inner-product search
+        # index = faiss.index_factory(d, "IVF1000,PQ128")
+        assert not index.is_trained
+        index.train(feature)
+        assert index.is_trained
+        index.add(feature)
+        index.nprobe = 700
+        return index
+
+    def normalize(self, x, copy=False):
+        """
+        A helper function that wraps the function of the same name in sklearn.
+        This helper handles the case of a single column vector.
+        """
+        if type(x) == np.ndarray and len(x.shape) == 1:
+            return np.squeeze(sknormalize(x.reshape(1, -1), copy=copy))
+            # return np.squeeze(x / np.sqrt((x ** 2).sum(-1))[..., np.newaxis])
+        else:
+            return sknormalize(x, copy=copy)
+            # return x / np.sqrt((x ** 2).sum(-1))[..., np.newaxis]
+
+    def search(self, image_path, recall_num):
+        img = get_transform()(image_path).to(self.device)
+        query = extract(self.model, img, args=self.args)
+
+        feature = self.pca.transform(np.array(query, dtype=np.float32))[0]
+        feature = self.normalize(feature)
+
+        D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
+        idxs, coarse_scores = I[0].tolist(), D[0].tolist()
+        paths = []
+        for idx in idxs:
+            paths.append(self.paths[idx])
+
+        return paths, coarse_scores
+
+    def save_query_res(self, image_path, similar_paths, dist, save_path, show=False):
+        im = cv2.imread(image_path.encode('utf-8', 'surrogateescape').decode('utf-8'))
+        image_id = image_path.split("/")[-1].split(".")[0]
+        plt.figure(image_id, figsize=(14, 13))
+        # gray()
+        plt.subplot(5, 4, 1)
+        plt.imshow(im[:, :, ::-1])
+        plt.axis('off')
+        i = 0
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+
+        for similar_path, score in zip(similar_paths, dist):
+            img = Image.open(similar_path)
+            plt.gray()
+            plt.subplot(5, 4, i + 5)
+            plt.title('{}'.format('%.2f' % score))
+            plt.imshow(img)
+            plt.axis('off')
+            i += 1
+        plt.savefig(save_path + os.path.sep + str(image_id) + '.jpg')
+        if show:
+            plt.show()
 
 
 def recall(queries, features, n_recall=10):

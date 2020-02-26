@@ -10,6 +10,7 @@ import torch
 import time
 from core.helper import batch_extract
 from sklearn.decomposition import PCA
+from core.search import Search
 
 parser = argparse.ArgumentParser(description="index images")
 
@@ -44,5 +45,6 @@ vectors = pca.transform(vectors)
 joblib.dump((vectors, paths), "vectors.pkl")
 joblib.dump(pca, "pca.pkl")
 
-
-
+# search = Search(model, "../data/vectors.pkl", "../data/pca.pkl", device, args=args)
+# paths, scores = search.search('../test/0a53f643515251.57f2991d49d25.jpg', 10)
+# print(scores)
