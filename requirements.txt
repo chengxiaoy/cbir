@@ -2,7 +2,7 @@ pymysql
 flask
 faiss
 scipy
-pillow==4.2.1
+pillow==6.2.0
 grpcio
 protobuf
 scikit-learn==0.21.3
