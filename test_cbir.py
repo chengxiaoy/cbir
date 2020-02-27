@@ -37,4 +37,4 @@ def getFeature(image_path, encode='r-mac', rpool=False, aggregate='sum'):
 
 
 if __name__ == '__main__':
-    print(getFeature('test/1/116-1.jpg','r-mac',False,'sum'))
+    print(getFeature('test/1/116-1.jpg','mac',True,'sum'))

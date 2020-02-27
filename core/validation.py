@@ -37,10 +37,11 @@ def valid(model, device, args, features_path, pca_path):
         paths, scores = search.search(query_path, 10)
         query_res[query_path] = (paths, scores)
 
-    joblib.dump(query_res, "query_res.pkl")
+    joblib.dump(query_res, "query_res_dla.pkl")
 
     eva = Evaluate("1", "2")
-    print(eva.mAP(query_res))
+    mAP = eva.mAP(query_res)
+    return mAP
 
 
 class Evaluate:
