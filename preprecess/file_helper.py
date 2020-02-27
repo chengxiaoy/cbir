@@ -26,18 +26,19 @@ def get_filename(path):
     return path.split('/')[-1]
 
 
-dst_dir = '../bgy_test'
-src_dir = '/local/CBIR/test'
-image_paths = get_image_paths(src_dir)
-image1_paths = list(filter(lambda x: get_label(x) == '1', image_paths))
-image2_paths = list(filter(lambda x: get_label(x) == '2', image_paths))
+if __name__ == '__main__':
+    dst_dir = '../bgy_test'
+    src_dir = '/local/CBIR/test'
+    image_paths = get_image_paths(src_dir)
+    image1_paths = list(filter(lambda x: get_label(x) == '1', image_paths))
+    image2_paths = list(filter(lambda x: get_label(x) == '2', image_paths))
 
-path_dir = {"1": image1_paths, "2": image2_paths}
-for key in path_dir:
-    paths = path_dir[key]
+    path_dir = {"1": image1_paths, "2": image2_paths}
+    for key in path_dir:
+        paths = path_dir[key]
 
-    for image_path in paths:
-        dst_sub_dir = os.path.sep.join((dst_dir, key))
-        if not os.path.exists(dst_sub_dir):
-            os.mkdir(dst_sub_dir)
-        shutil.move(image_path, os.path.sep.join((dst_sub_dir, get_filename(image_path))))
+        for image_path in paths:
+            dst_sub_dir = os.path.sep.join((dst_dir, key))
+            if not os.path.exists(dst_sub_dir):
+                os.mkdir(dst_sub_dir)
+            shutil.move(image_path, os.path.sep.join((dst_sub_dir, get_filename(image_path))))
