@@ -14,3 +14,4 @@ requests
 joblib
 flask-cors
 torchvision==0.4.0
+efficientnet_pytorch

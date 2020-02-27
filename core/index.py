@@ -11,6 +11,9 @@ import time
 from core.helper import batch_extract
 from sklearn.decomposition import PCA
 from core.search import Search
+import numpy as np
+from preprecess.file_helper import get_image_paths
+from core.validation import valid
 
 parser = argparse.ArgumentParser(description="index images")
 
@@ -33,18 +36,20 @@ device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else 
 model = get_model(args.model)
 model = model.to(device)
 
-data_set = get_dataset(args.dir, args.num)
-data_loader = get_dataloader(data_set)
+# index the file
 
-vectors, paths = batch_extract(model, data_loader, device, args)
+# data_set = get_dataset(args.dir, args.num)
+# data_loader = get_dataloader(data_set)
+#
+# vectors, paths = batch_extract(model, data_loader, device, args)
+#
+# pca = PCA(512, whiten=True)
+# pca.fit(vectors[:20000])
+# vectors = pca.transform(vectors)
+#
+# joblib.dump((vectors, paths), "vectors.pkl")
+# joblib.dump(pca, "pca.pkl")
 
-pca = PCA(512, whiten=True)
-pca.fit(vectors[:20000])
-vectors = pca.transform(vectors)
+mAP = valid(model, args=args, device=device, features_path="vectors.pkl", pca_path='pca.pkl')
 
-joblib.dump((vectors, paths), "vectors.pkl")
-joblib.dump(pca, "pca.pkl")
-
-# search = Search(model, "../data/vectors.pkl", "../data/pca.pkl", device, args=args)
-# paths, scores = search.search('../test/0a53f643515251.57f2991d49d25.jpg', 10)
-# print(scores)
+print("map is {}".format(mAP))
