@@ -25,8 +25,8 @@ parser.add_argument("--encoder", '-e', default='mac', required=False,
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='gmp', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_false', help="region pool")
-parser.add_argument("--model", '-m', default='resnet50', required=False,
-                    choices=['resnet50', 'dla34', 'eff_net', 'attention'],
+parser.add_argument("--model", '-m', default='resnet34', required=False,
+                    choices=['resnet50', 'resnet34', 'dla34', 'eff_net', 'attention'],
                     help='which model as the backbone')
 
 args = parser.parse_args()
