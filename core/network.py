@@ -7,7 +7,7 @@ import torch
 
 
 models = {
-    "resnet50": nn.Sequential(*list(resnet50(True).children())[:-2]),
+    "resnet50": nn.Sequential(*list(resnet50(pretrained=True).children())[:-2]),
     "eff-net": nn.Sequential(*list(EfficientNet.from_pretrained('efficientnet-b0').children())[:-2]),
     'dla34': nn.Sequential(*list(dla34(True).children())[:-2]),
     'attention': None,
@@ -21,7 +21,7 @@ def get_model(model_name):
     :param model_name:
     :return:
     """
-    return models[model_name]
+    return models[model_name].eval()
 
 
 def test(model_name):

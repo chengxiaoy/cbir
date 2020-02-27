@@ -38,17 +38,17 @@ model = model.to(device)
 
 # index the file
 
-# data_set = get_dataset(args.dir, args.num)
-# data_loader = get_dataloader(data_set)
-#
-# vectors, paths = batch_extract(model, data_loader, device, args)
-#
-# pca = PCA(512, whiten=True)
-# pca.fit(vectors[:20000])
-# vectors = pca.transform(vectors)
-#
-# joblib.dump((vectors, paths), "vectors.pkl")
-# joblib.dump(pca, "pca.pkl")
+data_set = get_dataset(args.dir, args.num)
+data_loader = get_dataloader(data_set)
+
+vectors, paths = batch_extract(model, data_loader, device, args)
+
+pca = PCA(512, whiten=True)
+pca.fit(vectors[:20000])
+vectors = pca.transform(vectors)
+
+joblib.dump((vectors, paths), "vectors.pkl")
+joblib.dump(pca, "pca.pkl")
 
 mAP = valid(model, args=args, device=device, features_path="vectors.pkl", pca_path='pca.pkl')
 

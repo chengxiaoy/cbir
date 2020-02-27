@@ -1,6 +1,6 @@
 from core.layers.pooling import MAC, RMAC, SPoC, GeM, Rpool, Hew
 import torch
-
+import torch.nn as nn
 
 POOLING = {
     'mac': MAC,
@@ -19,7 +19,7 @@ def get_feature_map(image_tensor, model):
     :return:
     """
 
-    image_tensor = torch.unsqueeze(image_tensor, 0)
+    # image_tensor = torch.unsqueeze(image_tensor, 0)
     return model(image_tensor)
 
 
@@ -31,7 +31,7 @@ def extract_vector(feature_map, encode_type, rpool=False, aggregate='sum'):
     :return:
     """
     if not rpool:
-        vector = POOLING[encode_type]()(feature_map)
+        vector = nn.functional.normalize(POOLING[encode_type]()(feature_map)).squeeze(-1).squeeze(-1)
     else:
         vector = Rpool(POOLING[encode_type]()).forward(feature_map, aggregate=aggregate)
     return vector
