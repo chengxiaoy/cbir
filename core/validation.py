@@ -26,10 +26,10 @@ def valid(model, device, args, features_path, pca_path):
     features = np.concatenate((features, vectors_)).astype(np.float32)
     paths.extend(paths_)
 
-    joblib.dump((features, paths), "../data/vectors_.pkl")
+    joblib.dump((features, paths), "vectors_.pkl")
 
     query_paths = get_image_paths('../bgy_test/1')
-    search = Search(model, "../data/vectors_.pkl", "../data/pca.pkl", device, args=args)
+    search = Search(model, "vectors_.pkl", "pca.pkl", device, args=args)
 
     query_res = {}
 
