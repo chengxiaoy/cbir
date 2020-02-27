@@ -175,7 +175,7 @@ def gmp(matrix, lamb=10, cgd=False):
     """
     D, N = matrix.shape
     if not cgd:
-        inv_matrix = np.linalg.inv(np.dot(matrix, np.transpose(matrix)) + lamb * np.diag([1] * D)).astype(np.float32)
+        inv_matrix = np.linalg.inv((np.dot(matrix, np.transpose(matrix)) + lamb * np.diag([1] * D)).astype(np.float32))
     else:
         inv_matrix = cg(np.dot(matrix, np.transpose(matrix)) + lamb * np.diag([1] * D), np.diag([1] * D))
 
@@ -278,8 +278,8 @@ def get_potential_inv_re(a, z):
 
 
 if __name__ == '__main__':
-    # m1 = np.random.randn(512, 20)
-    # gmp1 = gmp(m1.copy(), lamb=10, cgd=False)
+    m1 = np.random.randn(512, 20).astype(np.float32)
+    gmp1 = gmp(m1.copy(), lamb=10, cgd=False)
     # gmp2 = gmp(m1.copy(), lamb=10, cgd=True)
     # print(gmp1)
     # print(gmp2)

@@ -110,7 +110,7 @@ class Rpool(nn.Module):
             o = LF.gmm(o.detach().cpu().numpy())
             o = normalize(o)
         elif aggregate == 'gmp':
-            o = LF.gmp(o.detach().cpu().numpy().T)
+            o = LF.gmp(o.detach().cpu().numpy().astype(np.float32).T)
             o = normalize(o.reshape(1, -1))
         return o
 
