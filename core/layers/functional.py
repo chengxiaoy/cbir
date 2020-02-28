@@ -203,7 +203,7 @@ def create_mean(data):
     nfeats = 0
     dim = data[0].shape[2]
     mean_value = np.zeros(dim)
-    for i in range(data.shape[0]):
+    for i in range(len(data)):
         ele = data[i]
         ele = ele.reshape(-1, dim)
         ele = ele.T

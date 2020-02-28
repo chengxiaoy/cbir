@@ -8,7 +8,7 @@ import json
 from sklearn.preprocessing import normalize
 import torch
 import time
-from core.helper import batch_extract
+from core.helper import batch_extract, get_mean
 from sklearn.decomposition import PCA
 from core.search import Search
 import numpy as np
@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description="index images")
 parser.add_argument("--dir", '-d', default="../test/1", required=False, help="the dir need to be indexed")
 parser.add_argument("--num", '-n', default=200000, required=False)
 parser.add_argument("--gpu", '-g', default=0, choices=[0, 1])
-parser.add_argument("--encoder", '-e', default='mac', required=False,
+parser.add_argument("--encoder", '-e', default='hew', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
@@ -35,6 +35,12 @@ device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else 
 
 model = get_model(args.model)
 model = model.to(device)
+
+if args.encoder == 'hew':
+    data_set = get_dataset(args.dir, 20000)
+    data_loader = get_dataloader(data_set)
+    mean_vector = get_mean(model, data_loader, device)
+    joblib.dump(mean_vector, 'hew_means.pkl')
 
 # index the file
 
@@ -54,4 +60,6 @@ mAP = valid(model, args=args, device=device, features_path="vectors.pkl", pca_pa
 
 print("map is {}".format(mAP))
 
-# baseline is 0.68575
+# resnet50 +sum is 0.68575
+# resnet34 + gmp 0.685
+# resnet34 + sum 0.625
