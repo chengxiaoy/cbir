@@ -24,7 +24,7 @@ parser.add_argument("--encoder", '-e', default='hew', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
-parser.add_argument("--rpool", '-r', action='store_false', help="region pool")
+parser.add_argument("--rpool", '-r', action='store_true', help="region pool")
 parser.add_argument("--model", '-m', default='resnet34', required=False,
                     choices=['resnet50', 'resnet34', 'dla34', 'eff_net', 'attention'],
                     help='which model as the backbone')
@@ -41,6 +41,7 @@ if args.encoder == 'hew':
     data_loader = get_dataloader(data_set)
     mean_vector = get_mean(model, data_loader, device)
     joblib.dump(mean_vector, 'hew_means.pkl')
+
 
 # index the file
 

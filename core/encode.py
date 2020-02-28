@@ -31,7 +31,7 @@ def extract_vector(feature_map, encode_type, rpool=False, aggregate='sum'):
     :return:
     """
     if not rpool:
-        vector = nn.functional.normalize(POOLING[encode_type]()(feature_map)).squeeze(-1).squeeze(-1)
+        vector = POOLING[encode_type]()(feature_map)
     else:
         vector = Rpool(POOLING[encode_type]()).forward(feature_map, aggregate=aggregate)
     return vector

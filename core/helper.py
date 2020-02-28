@@ -3,7 +3,7 @@ from core.encode import get_feature_map, extract_vector
 import time
 from sklearn.decomposition import PCA
 from core.layers.functional import get_potential_inv_re, create_mean
-
+import torch
 
 def get_mean(model, data_loader, device):
     fm_list = []
@@ -42,6 +42,8 @@ def batch_extract(model, data_loader, device, args):
                 since = time.time()
 
                 vectors = extract(model, img, args)
+                if isinstance(vectors,torch.Tensor):
+                    vectors = vectors.detach().cpu().numpy()
                 # vectors = normalize(vectors)
 
                 paths = [path] * len(vectors)

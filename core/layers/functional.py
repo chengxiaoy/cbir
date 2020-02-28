@@ -236,7 +236,7 @@ def weight_Heat(feature_map, mean):
     weights = get_potential_inv(a, z)
     weights = 1. / weights
     weighted_feature_map = feature_map_org * weights
-    return np.sum(weighted_feature_map, axis=1)
+    return normalize(np.sum(weighted_feature_map, axis=1).reshape(1, -1))
 
 
 def get_potential_inv(a, z):

@@ -69,11 +69,14 @@ class RMAC(nn.Module):
 class Hew(nn.Module):
     def __init__(self):
         super(Hew, self).__init__()
+        self.mean = None
 
     def forward(self, x):
-        mean = joblib.load('hew_means.pkl')
-        x = x.detach().cpu().numpy()
-        return torch.Tensor(LF.weight_Heat(x, mean)).float()
+        if self.mean is None:
+            self.mean = joblib.load('hew_means.pkl')
+        x = x.squeeze(0).detach().cpu().numpy().T
+
+        return LF.weight_Heat(x, self.mean)
 
 
 class Rpool(nn.Module):
