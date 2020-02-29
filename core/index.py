@@ -25,7 +25,7 @@ parser.add_argument("--encoder", '-e', default='hew', required=False,
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_true', help="region pool")
-parser.add_argument("--model", '-m', default='resnet34', required=False,
+parser.add_argument("--model", '-m', default='attention', required=False,
                     choices=['resnet50', 'resnet34', 'dla34', 'eff_net', 'attention'],
                     help='which model as the backbone')
 
@@ -36,16 +36,15 @@ device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else 
 model = get_model(args.model)
 model = model.to(device)
 
-if args.encoder == 'hew':
-    data_set = get_dataset(args.dir, 20000)
-    data_loader = get_dataloader(data_set)
-    mean_vector = get_mean(model, data_loader, device)
-    joblib.dump(mean_vector, 'hew_means.pkl')
-
+# if args.encoder == 'hew':
+#     data_set = get_dataset(args.dir, 20000, args=args)
+#     data_loader = get_dataloader(data_set)
+#     mean_vector = get_mean(model, data_loader, device)
+#     joblib.dump(mean_vector, 'hew_means.pkl')
 
 # index the file
 
-data_set = get_dataset(args.dir, args.num)
+data_set = get_dataset(args.dir, args.num, args=args)
 data_loader = get_dataloader(data_set)
 
 vectors, paths = batch_extract(model, data_loader, device, args)
@@ -64,3 +63,4 @@ print("map is {}".format(mAP))
 # resnet50 +sum is 0.68575
 # resnet34 + gmp 0.685
 # resnet34 + sum 0.625
+# resnet34 + hew 0.696

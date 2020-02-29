@@ -5,6 +5,8 @@ import sys
 from PIL import Image
 import numpy as np
 import torch
+import cv2
+from torch.autograd import Variable
 
 # normalize = transforms.Normalize()
 transform = transforms.Compose([
@@ -12,6 +14,36 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     # normalize,
 ])
+
+
+class ImageHelper:
+    def __init__(self, S, means):
+        self.S = S
+        self.means = means
+
+    def get_features(self, I, net, gpu_num):
+        # output = net(Variable(torch.from_numpy(I).cuda(gpu_num)))
+        output = net(Variable(torch.from_numpy(I)))
+        output = np.squeeze(output.cpu().data.numpy())
+        return output
+
+    def load_and_prepare_image(self, fname, roi=None):
+        # Read image, get aspect ratio, and resize such as the largest side equals S
+        im = cv2.imread(fname)
+
+        im_size_hw = np.array(im.shape[0:2])
+        ratio = float(self.S) / np.max(im_size_hw)
+        new_size = tuple(np.round(im_size_hw * ratio).astype(np.int32))
+        im_resized = cv2.resize(im, (new_size[1], new_size[0]))
+        # If there is a roi, adapt the roi to the new size and crop. Do not rescale
+        # the image once again
+        if roi is not None:
+            roi = np.round(roi * ratio).astype(np.int32)
+            im_resized = im_resized[roi[1]:roi[3], roi[0]:roi[2], :]
+        # Transpose for network and subtract mean
+
+        I = im_resized.transpose(2, 0, 1) - self.means
+        return I
 
 
 def image_loader_ms(image_name):
@@ -76,15 +108,22 @@ class DirDataset(Dataset):
     the id is the file name, the file under the dir is all need collected in to the dataset
     """
 
-    def __init__(self, root_dir, nums):
+    def __init__(self, root_dir, nums, args):
         super(DirDataset, self).__init__()
         self.root_dir = root_dir
         self.nums = nums
         self.image_paths = self.get_image_paths(self.root_dir)
+        self.args = args
+        self.image_helper = ImageHelper(800,
+                                        np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
+                                        None, None])
 
     def __getitem__(self, index):
         try:
             image_path = self.image_paths[index]
+            if self.args == 'attention':
+                return Variable(torch.from_numpy(self.image_helper.load_and_prepare_image(image_path))), image_path
+
             trans = get_transform()
             return trans(image_path), image_path
         except Exception as e:
@@ -105,14 +144,14 @@ class DirDataset(Dataset):
         return image_path_list[:self.nums]
 
 
-def get_dataset(root_dir, nums):
+def get_dataset(root_dir, nums, args):
     """
     get the dataset of the iamges under the root_dir
     :param nums:
     :param root_dir:
     :return:
     """
-    return DirDataset(root_dir, nums)
+    return DirDataset(root_dir, nums, args=args)
 
 
 def collate_tuples(batch):

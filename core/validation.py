@@ -13,7 +13,7 @@ from preprecess.file_helper import get_image_paths
 
 def valid(model, device, args, features_path, pca_path):
     # add the need retrieval pic
-    data_set = get_dataset('../bgy_test/2', 100)
+    data_set = get_dataset('../bgy_test/2', 100, args)
     data_loader = get_dataloader(data_set)
 
     vectors_, paths_ = batch_extract(model, data_loader, device, args)

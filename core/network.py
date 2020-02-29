@@ -1,10 +1,10 @@
-from torchvision.models import resnet50,resnet34
+from torchvision.models import resnet50, resnet34
 from efficientnet_pytorch import EfficientNet
 from core.models.dlav0 import dla34
 from torch import nn
 import torch
-
-
+import numpy as np
+from core.attention import OurNet
 
 models = {
     "resnet50": nn.Sequential(*list(resnet50(pretrained=True).children())[:-2]),
@@ -22,6 +22,17 @@ def get_model(model_name):
     :param model_name:
     :return:
     """
+    if model_name == 'attention':
+        S = 1024  # Maximum dimension
+        weight_path = 'weights/ContextAwareRegionalAttention_weights.pth'
+        means = np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :, None, None]
+        net = OurNet()
+        net.eval()
+
+        # Load the trained weights of regional attention network
+        dic = torch.load(weight_path, map_location='cpu')
+        net.region_attention.load_state_dict(dic, strict=True)
+        return net
     return models[model_name].eval()
 
 
