@@ -114,7 +114,7 @@ class DirDataset(Dataset):
         self.nums = nums
         self.image_paths = self.get_image_paths(self.root_dir)
         self.args = args
-        self.image_helper = ImageHelper(800,
+        self.image_helper = ImageHelper(1024,
                                         np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
                                         None, None])
 

@@ -37,7 +37,7 @@ def valid(model, device, args, features_path, pca_path):
         paths, scores = search.search(query_path, 10)
         query_res[query_path] = (paths, scores)
 
-    joblib.dump(query_res, "query_res_34_gmp.pkl")
+    joblib.dump(query_res, "query_res_att.pkl")
 
     eva = Evaluate("1", "2")
     mAP = eva.mAP(query_res)
@@ -88,6 +88,18 @@ class Evaluate:
         if show:
             plt.show()
         plt.close()
+
+    def precision(self, query_res, top_k):
+        count = 0
+        right_count = 0
+        for query_path in query_res:
+            count = count + 1
+            res_list = query_res[query_path][0][:top_k]
+            for res in res_list:
+                if self.get_label(query_path) == self.get_label(res):
+                    right_count = right_count + 1
+                    break
+        return right_count / count
 
     def mAP(self, query_res):
         count = 0
@@ -146,3 +158,12 @@ class Evaluate:
             return file_path.split('/')[-1].split('.')[0].split('_')[0].split()
         else:
             return 0
+
+
+
+if __name__ == '__main__':
+    eva = Evaluate("1","2")
+    hew = joblib.load("../data/query_res_att.pkl")
+    presion = eva.precision(hew,10)
+    print("map is {}".format(eva.mAP(hew)))
+    print(presion)
