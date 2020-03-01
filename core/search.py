@@ -28,7 +28,8 @@ class Search:
         self.features, self.paths = joblib.load(features_path)
         self.features = self.features.astype(np.float32)
         self.features = self.normalize(self.features)
-        # self.pca = joblib.load(pca_path)
+        if args.pca:
+            self.pca = joblib.load(pca_path)
         self.device = device
         self.args = args
         self.invert_index = self.get_invert_index(feature=self.features)
@@ -62,11 +63,11 @@ class Search:
     def search(self, image_path, recall_num):
         img = get_transform()(image_path).to(self.device)
         query = extract(self.model, img, args=self.args)
-        feature = query[0]
-        #
-        # feature = self.pca.transform(np.array(query, dtype=np.float32))[0]
-        # feature = self.normalize(feature)
-
+        if self.args.pca:
+            feature = self.pca.transform(np.array(query, dtype=np.float32))[0]
+            feature = self.normalize(feature)
+        else:
+            feature = query[0]
         D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
         idxs, coarse_scores = I[0].tolist(), D[0].tolist()
         paths = []

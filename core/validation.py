@@ -17,19 +17,19 @@ def valid(model, device, args, features_path, pca_path):
     data_loader = get_dataloader(data_set)
 
     vectors_, paths_ = batch_extract(model, data_loader, device, args)
-
-    # pca = joblib.load(pca_path)
-    # vectors_ = pca.transform(np.array(vectors_, dtype=np.float32))
-    # vectors_ = normalize(vectors_)
+    if args.pca:
+        pca = joblib.load(pca_path)
+        vectors_ = pca.transform(np.array(vectors_, dtype=np.float32))
+        vectors_ = normalize(vectors_)
     features, paths = joblib.load(features_path)
 
     features = np.concatenate((features, vectors_)).astype(np.float32)
     paths.extend(paths_)
 
-    joblib.dump((features, paths), "vectors_.pkl")
+    joblib.dump((features, paths), args + "vectors_.pkl")
 
     query_paths = get_image_paths('../bgy_test/1')
-    search = Search(model, "vectors_.pkl", "pca.pkl", device, args=args)
+    search = Search(model, args.id + "vectors_.pkl", pca_path, device, args=args)
 
     query_res = {}
 
@@ -37,9 +37,9 @@ def valid(model, device, args, features_path, pca_path):
         paths, scores = search.search(query_path, 10)
         query_res[query_path] = (paths, scores)
 
-    joblib.dump(query_res, "query_res_att.pkl")
+    joblib.dump(query_res, args.id + "query_res.pkl")
 
-    eva = Evaluate("1")
+    eva = Evaluate("error.jpg")
     mAP = eva.mAP(query_res)
     return mAP
 
