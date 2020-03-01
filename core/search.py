@@ -28,7 +28,7 @@ class Search:
         self.features, self.paths = joblib.load(features_path)
         self.features = self.features.astype(np.float32)
         self.features = self.normalize(self.features)
-        self.pca = joblib.load(pca_path)
+        # self.pca = joblib.load(pca_path)
         self.device = device
         self.args = args
         self.invert_index = self.get_invert_index(feature=self.features)
