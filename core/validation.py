@@ -18,9 +18,9 @@ def valid(model, device, args, features_path, pca_path):
 
     vectors_, paths_ = batch_extract(model, data_loader, device, args)
 
-    pca = joblib.load(pca_path)
-    vectors_ = pca.transform(np.array(vectors_, dtype=np.float32))
-    vectors_ = normalize(vectors_)
+    # pca = joblib.load(pca_path)
+    # vectors_ = pca.transform(np.array(vectors_, dtype=np.float32))
+    # vectors_ = normalize(vectors_)
     features, paths = joblib.load(features_path)
 
     features = np.concatenate((features, vectors_)).astype(np.float32)

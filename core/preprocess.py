@@ -141,6 +141,8 @@ class DirDataset(Dataset):
                 image_path_list.append(file)
             else:
                 image_path_list.extend(self.get_image_paths(file))
+
+        image_path_list = sorted(image_path_list)
         return image_path_list[:self.nums]
 
 
