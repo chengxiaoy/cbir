@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     files = os.listdir('data/')
     for f in files:
-        query_res = joblib.load(f)
+        query_res = joblib.load('data/'+f)
         f_name = f.split('/')[-1].split('.')[0]
         mAP = eva.mAP(query_res)
         precision = eva.precision(query_res, 10)
