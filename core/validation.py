@@ -39,15 +39,14 @@ def valid(model, device, args, features_path, pca_path):
 
     joblib.dump(query_res, "query_res_att.pkl")
 
-    eva = Evaluate("1", "2")
+    eva = Evaluate("1")
     mAP = eva.mAP(query_res)
     return mAP
 
 
 class Evaluate:
-    def __init__(self, default_path, sava_path):
+    def __init__(self, default_path='error.jpg'):
         self.default_path = default_path
-        self.save_path = sava_path
 
     def get_label_info(self, path):
         files = os.listdir(path)
@@ -64,7 +63,7 @@ class Evaluate:
                 label_dict[label] = 1
         return label_dict
 
-    def show(self, image_path, similar_paths, dist, show=False):
+    def show(self, image_path, similar_paths, dist, save_path, show=False):
         im = cv2.imread(image_path.encode('utf-8', 'surrogateescape').decode('utf-8'))
         image_id = image_path.split("/")[-1].split(".")[0]
         plt.figure(image_id, figsize=(14, 13))
@@ -84,7 +83,7 @@ class Evaluate:
             plt.imshow(img)
             plt.axis('off')
             i += 1
-        plt.savefig(self.save_path + str(image_id) + '.jpg')
+        plt.savefig(save_path + str(image_id) + '.jpg')
         if show:
             plt.show()
         plt.close()
@@ -160,10 +159,9 @@ class Evaluate:
             return 0
 
 
-
 if __name__ == '__main__':
-    eva = Evaluate("1","2")
-    hew = joblib.load("../data/query_res_att.pkl")
-    presion = eva.precision(hew,10)
+    eva = Evaluate()
+    hew = joblib.load("../data/query_res_dla.pkl")
+    presion = eva.precision(hew, 10)
     print("map is {}".format(eva.mAP(hew)))
     print(presion)

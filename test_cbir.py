@@ -22,6 +22,7 @@ from core.preprocess import get_transform
 from core.encode import get_feature_map, extract_vector
 from core.network import get_model
 import torch
+from core.validation import Evaluate
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -37,4 +38,18 @@ def getFeature(image_path, encode='r-mac', rpool=False, aggregate='sum'):
 
 
 if __name__ == '__main__':
-    print(getFeature('test/1/116-1.jpg','mac',True,'sum'))
+
+    eva = Evaluate("error.jpg")
+
+    files = os.listdir('data/')
+    for f in files:
+        query_res = joblib.load(f)
+        f_name = f.split('/')[-1].split('.')[0]
+        mAP = eva.mAP(query_res)
+        precision = eva.precision(query_res, 10)
+
+        dir_name = "/data/User/chengying/" + f_name + "_map{}_preci{}".format(mAP, precision) + "/"
+        for query in query_res:
+            eva.show(query, query_res[query][0], query_res[query][1], dir_name)
+
+    # print(getFeature('test/1/116-1.jpg', 'mac', True, 'sum'))
