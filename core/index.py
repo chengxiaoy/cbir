@@ -50,16 +50,16 @@ model = model.to(device)
 data_set = get_dataset(args.dir, args.num, args=args)
 data_loader = get_dataloader(data_set)
 
-# vectors, paths = batch_extract(model, data_loader, device, args)
-# # vectors, paths = joblib.load("vectors.pkl")
-# #
-# if args.pca:
-#     pca = PCA(512, whiten=True)
-#     pca.fit(vectors[:20000])
-#     vectors = pca.transform(vectors)
+vectors, paths = batch_extract(model, data_loader, device, args)
+# vectors, paths = joblib.load("vectors.pkl")
 #
-#     joblib.dump(pca, args.id + "pca.pkl")
-# joblib.dump((vectors, paths), args.id + "vectors.pkl")
+if args.pca:
+    pca = PCA(512, whiten=True)
+    pca.fit(vectors[:20000])
+    vectors = pca.transform(vectors)
+
+    joblib.dump(pca, args.id + "pca.pkl")
+joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
 mAP = valid(model, args=args, device=device, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
 
@@ -67,3 +67,5 @@ print("map is {}".format(mAP))
 
 # 1 resnet50 + rpool + mac + sum
 # 2 dla34 + rpool + mac +sum
+# 3 resnet34 + rpool + mac + sum
+# 4 dla102 + rpool + mac + sum
