@@ -79,7 +79,7 @@ def image_loader(image_name):
     images = []
     for max_side_length in max_side_lengths:
         ratio = float(max_side_length) / np.max(im_size_hw)
-        new_size = tuple(np.round(im_size_hw * ratio.astype(float)).astype(np.int32))
+        new_size = tuple(np.round(im_size_hw * ratio.astype(float) // 32 * 32).astype(np.int32))
         # fake batch dimension required to fit network's input dimensions
         loader = transforms.Compose(
             [

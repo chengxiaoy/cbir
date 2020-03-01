@@ -4,6 +4,7 @@ import time
 from sklearn.decomposition import PCA
 from core.layers.functional import get_potential_inv_re, create_mean
 import torch
+import numpy as np
 
 
 def get_mean(model, data_loader, device):

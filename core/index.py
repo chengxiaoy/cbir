@@ -25,7 +25,7 @@ parser.add_argument("--encoder", '-e', default='hew', required=False,
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_true', help="region pool")
-parser.add_argument("--model", '-m', default='attention', required=False,
+parser.add_argument("--model", '-m', default='dla34', required=False,
                     choices=['resnet50', 'resnet34', 'dla34', 'eff_net', 'attention'],
                     help='which model as the backbone')
 
@@ -49,9 +49,9 @@ data_loader = get_dataloader(data_set)
 
 vectors, paths = batch_extract(model, data_loader, device, args)
 
-# pca = PCA(512, whiten=True)
-# pca.fit(vectors[:20000])
-# vectors = pca.transform(vectors)
+pca = PCA(512, whiten=True)
+pca.fit(vectors[:20000])
+vectors = pca.transform(vectors)
 
 joblib.dump((vectors, paths), "vectors.pkl")
 # joblib.dump(pca, "pca.pkl")
