@@ -72,7 +72,10 @@ class Evaluate:
         plt.imshow(im[:, :, ::-1])
         plt.axis('off')
         i = 0
+        right_index = "nan"
         for similar_path, score in zip(similar_paths, dist):
+            if self.get_label(image_path) == self.get_label(similar_path):
+                right_index = i + 1
 
             if not os.path.exists(similar_path):
                 similar_path = self.default_path
@@ -83,7 +86,7 @@ class Evaluate:
             plt.imshow(img)
             plt.axis('off')
             i += 1
-        plt.savefig(save_path + str(image_id) + '.jpg')
+        plt.savefig(save_path + str(image_id) + "_" + str(right_index) + '.jpg')
         if show:
             plt.show()
         plt.close()
