@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(description="index images")
 
 parser.add_argument("--dir", '-d', default="../test/1", required=False, help="the dir need to be indexed")
 parser.add_argument("--num", '-n', default=200000, required=False)
-parser.add_argument("--gpu", '-g', default=0, choices=[0, 1])
+parser.add_argument("--gpu", '-g', default=0, choices=[0, 1],type=int)
 parser.add_argument("--encoder", '-e', default='hew', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
