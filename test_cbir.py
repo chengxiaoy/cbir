@@ -43,12 +43,15 @@ if __name__ == '__main__':
 
     files = os.listdir('data/')
     for f in files:
-        query_res = joblib.load('data/'+f)
+        query_res = joblib.load('data/' + f)
         f_name = f.split('/')[-1].split('.')[0]
         mAP = eva.mAP(query_res)
         precision = eva.precision(query_res, 10)
 
-        dir_name = "/data/User/chengying/" + f_name + "_map{}_preci{}".format(mAP, precision) + "/"
+        dir_name = "/data/User/chengying/" + f_name + "_map{}_preci{}".format(round(mAP, 2), precision) + "/"
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
+
         for query in query_res:
             eva.show(query, query_res[query][0], query_res[query][1], dir_name)
 
