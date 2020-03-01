@@ -39,11 +39,11 @@ device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else 
 model = get_model(args.model)
 model = model.to(device)
 
-# if args.encoder == 'hew':
-#     data_set = get_dataset(args.dir, 20000, args=args)
-#     data_loader = get_dataloader(data_set)
-#     mean_vector = get_mean(model, data_loader, device)
-#     joblib.dump(mean_vector, 'hew_means.pkl')
+if args.encoder == 'hew':
+    data_set = get_dataset(args.dir, 20000, args=args)
+    data_loader = get_dataloader(data_set)
+    mean_vector = get_mean(model, data_loader, device)
+    joblib.dump(mean_vector, 'hew_means.pkl')
 
 # index the file
 
