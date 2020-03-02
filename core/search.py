@@ -61,8 +61,8 @@ class Search:
             # return x / np.sqrt((x ** 2).sum(-1))[..., np.newaxis]
 
     def search(self, image_path, recall_num):
-        img = get_transform()(image_path).to(self.device)
-        query = extract(self.model, img, args=self.args)
+        img = get_transform()(image_path)
+        query = extract(self.model, img, self.args, self.device)
         if self.args.pca:
             feature = self.pca.transform(np.array(query, dtype=np.float32))[0]
             feature = self.normalize(feature)

@@ -25,10 +25,11 @@ parser.add_argument("--encoder", '-e', default='mac', required=False,
                     help='the encoder method for feature_map to vector')
 parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_false', help="region pool")
-parser.add_argument("--model", '-m', default='eff-net', required=False,
+parser.add_argument("--model", '-m', default='resnet50', required=False,
                     choices=['resnet50', 'resnet34', 'dla34', 'dla102x', 'eff-net', 'attention'],
                     help='which model as the backbone')
 parser.add_argument("--pca", '-p', action='store_false', help="need pca")
+parser.add_argument("--multi_scale", '-s', action='store_false')
 
 parser.add_argument('--id', '-i', default="1")
 
@@ -71,3 +72,4 @@ print("map is {}".format(mAP))
 # 4 dla102 + rpool + mac + sum
 # 5 resnet50  + hew
 # 6 eff_net + rpool + mac +sum
+# 7 resnet50 + rpool + mac + sum + ms

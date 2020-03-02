@@ -51,11 +51,11 @@ def image_loader_ms(image_name):
     im = im.convert('RGB')
     im_size_hw = np.array(im.size[::-1])
 
-    max_side_lengths = [550, 800, 1050]
+    max_side_lengths = [512, 800, 1024]
     images = []
     for max_side_length in max_side_lengths:
         ratio = float(max_side_length) / np.max(im_size_hw)
-        new_size = tuple(np.round(im_size_hw * ratio.astype(float)).astype(np.int32))
+        new_size = tuple(np.round(im_size_hw * ratio.astype(float) // 32 * 32).astype(np.int32))
         # fake batch dimension required to fit network's input dimensions
         loader = transforms.Compose(
             [
@@ -94,12 +94,14 @@ def image_loader(image_name):
     return images[0]
 
 
-def get_transform():
+def get_transform(args):
     """
     transform the image
     :param image: the pillow format
     :return:
     """
+    if args.multi_scale:
+        return image_loader_ms
     return image_loader
 
 
@@ -124,7 +126,7 @@ class DirDataset(Dataset):
             if self.args == 'attention':
                 return Variable(torch.from_numpy(self.image_helper.load_and_prepare_image(image_path))), image_path
 
-            trans = get_transform()
+            trans = get_transform(self.args)
             return trans(image_path), image_path
         except Exception as e:
             return torch.zeros(0), "error_path"

@@ -5,6 +5,7 @@ from sklearn.decomposition import PCA
 from core.layers.functional import get_potential_inv_re, create_mean
 import torch
 import numpy as np
+from sklearn.preprocessing import normalize
 
 
 def get_mean(model, data_loader, device):
@@ -40,10 +41,9 @@ def batch_extract(model, data_loader, device, args):
                 if path == 'error_path':
                     print("get {} image feature failed!".format(path))
                     continue
-                img = img.to(device)
                 since = time.time()
 
-                vectors = extract(model, img, args)
+                vectors = extract(model, img, args, device)
                 if isinstance(vectors, torch.Tensor):
                     vectors = vectors.detach().cpu().numpy()
                 # vectors = normalize(vectors)
@@ -58,9 +58,24 @@ def batch_extract(model, data_loader, device, args):
     return indexed_vectors, indexed_ids
 
 
-def extract(model, img_tensor, args):
-    if args.model == 'attention':
-        return model(img_tensor).cpu().detach().numpy()
-    fm = get_feature_map(img_tensor, model, args)
-    vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
-    return vectors
+def extract(model, img_tensor, args, device):
+    vector_list = []
+    if args.multi_scale:
+        for img in img_tensor:
+            img = img.to(device)
+            if args.model == 'attention':
+                return model(img).cpu().detach().numpy()
+            fm = get_feature_map(img, model, args)
+            vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
+            vector_list.extend(vectors)
+
+        return normalize(np.array([np.array(vector_list, dtype=np.float32).sum(axis=0)]))
+
+    else:
+        img_tensor = img_tensor.to(device)
+
+        if args.model == 'attention':
+            return model(img_tensor).cpu().detach().numpy()
+        fm = get_feature_map(img_tensor, model, args)
+        vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
+        return vectors
