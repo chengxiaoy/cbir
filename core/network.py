@@ -1,4 +1,4 @@
-from torchvision.models import resnet50, resnet34
+from torchvision.models import resnet50, resnet34,resnet101
 from efficientnet_pytorch import EfficientNet
 from core.models.dlav0 import dla34,dla102x
 from torch import nn
@@ -8,6 +8,7 @@ from core.attention import OurNet
 
 models = {
     "resnet50": nn.Sequential(*list(resnet50(pretrained=True).children())[:-2]),
+    "resnet101": nn.Sequential(*list(resnet101(pretrained=True).children())[:-2]),
     "resnet34": nn.Sequential(*list(resnet34(pretrained=True).children())[:-2]),
     "eff-net": EfficientNet.from_pretrained('efficientnet-b0'),
     'dla34': nn.Sequential(*list(dla34(True).children())[:-2]),
