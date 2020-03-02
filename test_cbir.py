@@ -32,7 +32,7 @@ def getFeature(image_path, encode='r-mac', rpool=False, aggregate='sum'):
     model = get_model('resnet50')
 
     fm = get_feature_map(img, model)
-    vectors = extract_vector(fm, encode, rpool, aggregate)
+    vectors = extract_vector(fm, encode, rpool, aggregate,device)
 
     return vectors
 

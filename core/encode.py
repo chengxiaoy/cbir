@@ -25,7 +25,7 @@ def get_feature_map(image_tensor, model, args):
     return model(image_tensor)
 
 
-def extract_vector(feature_map, encode_type, rpool=False, aggregate='sum'):
+def extract_vector(feature_map, encode_type, rpool=False, aggregate='sum', device=torch.device("cpu")):
     """
     feature_map ---> vector or vectors
     :param encode_type:
@@ -33,7 +33,7 @@ def extract_vector(feature_map, encode_type, rpool=False, aggregate='sum'):
     :return:
     """
     if not rpool:
-        vector = POOLING[encode_type]()(feature_map)
+        vector = POOLING[encode_type]().to(device)(feature_map)
     else:
-        vector = Rpool(POOLING[encode_type]()).forward(feature_map, aggregate=aggregate)
+        vector = Rpool(POOLING[encode_type]().to(device)).forward(feature_map, aggregate=aggregate)
     return vector
