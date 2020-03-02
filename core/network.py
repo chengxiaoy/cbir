@@ -9,7 +9,7 @@ from core.attention import OurNet
 models = {
     "resnet50": nn.Sequential(*list(resnet50(pretrained=True).children())[:-2]),
     "resnet34": nn.Sequential(*list(resnet34(pretrained=True).children())[:-2]),
-    "eff-net": nn.Sequential(*list(EfficientNet.from_pretrained('efficientnet-b0').children())[:-2]),
+    "eff-net": EfficientNet.from_pretrained('efficientnet-b0'),
     'dla34': nn.Sequential(*list(dla34(True).children())[:-2]),
     'dla102x': nn.Sequential(*list(dla102x(True).children())[:-2]),
     'attention': None,
@@ -49,4 +49,4 @@ def test(model_name):
 
 
 if __name__ == '__main__':
-    test('resnet50')
+    test('eff-net')

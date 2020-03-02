@@ -11,7 +11,7 @@ POOLING = {
 }
 
 
-def get_feature_map(image_tensor, model):
+def get_feature_map(image_tensor, model, args):
     """
     image(pil) ---> feature_map
     :param model:
@@ -20,6 +20,8 @@ def get_feature_map(image_tensor, model):
     """
 
     # image_tensor = torch.unsqueeze(image_tensor, 0)
+    if args.model == 'eff-net':
+        return model.extract_features(image_tensor)
     return model(image_tensor)
 
 

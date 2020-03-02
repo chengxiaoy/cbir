@@ -61,6 +61,6 @@ def batch_extract(model, data_loader, device, args):
 def extract(model, img_tensor, args):
     if args.model == 'attention':
         return model(img_tensor).cpu().detach().numpy()
-    fm = get_feature_map(img_tensor, model)
+    fm = get_feature_map(img_tensor, model, args)
     vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate)
     return vectors
