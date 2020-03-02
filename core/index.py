@@ -29,7 +29,7 @@ parser.add_argument("--model", '-m', default='resnet50', required=False,
                     choices=['resnet50', 'resnet34', 'dla34', 'dla102x', 'eff-net', 'attention'],
                     help='which model as the backbone')
 parser.add_argument("--pca", '-p', action='store_false', help="need pca")
-parser.add_argument("--multi_scale", '-s', action='store_false')
+parser.add_argument("--multi_scale", '-s', action='store_true')
 
 parser.add_argument('--id', '-i', default="1")
 
