@@ -138,6 +138,7 @@ def HeR(ranks, ids, qvec):
     :param ranks:
     :return:
     """
+    since = time()
 
     conc = np.concatenate((ranks, qvec.reshape(-1, 1)), axis=1)
     mean = np.mean(conc, axis=1)
@@ -150,6 +151,7 @@ def HeR(ranks, ids, qvec):
     weights = get_potential_inv_re(a, z)
     # descend
     indexs = np.argsort(-weights)
+    print("her rerank cost {} s".format(round(time() - since, 3)))
     return ids[indexs]
 
 
