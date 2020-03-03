@@ -68,11 +68,21 @@ class Search:
             feature = self.normalize(feature)
         else:
             feature = query[0]
-        D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
+        if self.args.rerank == 'her':
+            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), 1000)
+        else:
+            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
+
         idxs, coarse_scores = I[0].tolist(), D[0].tolist()
         paths = []
         for idx in idxs:
             paths.append(self.paths[idx])
+        paths = np.array(paths)
+
+        if self.args.rerank == 'her':
+            features = self.features[idxs]
+            rerank_paths = HeR(features.T, paths, feature)
+            return rerank_paths[:recall_num], coarse_scores[:recall_num]
 
         return paths, coarse_scores
 

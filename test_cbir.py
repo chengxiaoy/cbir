@@ -55,4 +55,4 @@ if __name__ == '__main__':
         for query in query_res:
             eva.show(query, query_res[query][0], query_res[query][1], dir_name)
 
-    # print(getFeature('test/1/116-1.jpg', 'mac', True, 'sum'))
+    # print(getFeature('bgy_test/1/116-1.jpg', 'mac', True, 'sum'))

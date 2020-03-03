@@ -28,7 +28,7 @@ def get_filename(path):
 
 if __name__ == '__main__':
     dst_dir = '../bgy_test'
-    src_dir = '/local/CBIR/test'
+    src_dir = '/local/CBIR/bgy_test'
     image_paths = get_image_paths(src_dir)
     image1_paths = list(filter(lambda x: get_label(x) == '1', image_paths))
     image2_paths = list(filter(lambda x: get_label(x) == '2', image_paths))

@@ -228,7 +228,7 @@ if __name__ == '__main__':
 
     image_helper = ImageHelper(S, means)
 
-    I = image_helper.load_and_prepare_image('../test/1/163-1.jpg')
+    I = image_helper.load_and_prepare_image('../bgy_test/1/163-1.jpg')
 
     feat = image_helper.get_features(I, net, gpu_num)
     print(feat)
