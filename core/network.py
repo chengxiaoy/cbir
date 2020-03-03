@@ -1,10 +1,11 @@
-from torchvision.models import resnet50, resnet34,resnet101
+from torchvision.models import resnet50, resnet34, resnet101
 from efficientnet_pytorch import EfficientNet
-from core.models.dlav0 import dla34,dla102x
+from core.models.dlav0 import dla34, dla102x
 from torch import nn
 import torch
 import numpy as np
 from core.attention import OurNet
+import os
 
 models = {
     "resnet50": nn.Sequential(*list(resnet50(pretrained=True).children())[:-2]),
@@ -26,7 +27,9 @@ def get_model(model_name):
     """
     if model_name == 'attention':
         S = 1024  # Maximum dimension
-        weight_path = 'weights/ContextAwareRegionalAttention_weights.pth'
+        # weight_path = 'weights/ContextAwareRegionalAttention_weights.pth'
+        weight_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                   'weights/ContextAwareRegionalAttention_weights.pth')
         means = np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :, None, None]
         net = OurNet()
         net.eval()

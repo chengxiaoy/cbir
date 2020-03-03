@@ -13,7 +13,7 @@ from tqdm import tqdm
 import cv2
 import argparse
 import subprocess
-from core.layers.common  import get_rmac_region_coordinates
+from core.layers.common import get_rmac_region_coordinates
 from core.layers.common import pack_regions_for_network
 from core.layers.common import L2Normalization
 from core.layers.common import Shift
@@ -102,12 +102,17 @@ class OurNet(nn.Module):
         self.pca_shift = Shift(2048)
         self.pca_fc = nn.Linear(2048, 2048, bias=False)
         # Load the PCA weights learned with off-the-shelf Resnet101
-        self.pca_fc.weight.data = torch.Tensor(np.load('weights/pca_components.npy'))
-        self.pca_shift.bias.data = torch.Tensor(np.load('weights/pca_mean.npy'))
+        self.pca_fc.weight.data = torch.Tensor(
+            np.load(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'weights/pca_components.npy')))
+        # self.pca_shift.bias.data = torch.Tensor(np.load('weights/pca_mean.npy'))
+        self.pca_shift.bias.data = torch.Tensor(
+            np.load(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'weights/pca_mean.npy')))
 
         self.resnet = resnet.resnet101(pretrained=False)
         # Load off-the-shelf Resnet101 of caffe version.
-        dic = torch.load('weights/resnet101_caffeProto.pth', map_location=lambda storage, loc: storage)
+        # dic = torch.load('weights/resnet101_caffeProto.pth', map_location=lambda storage, loc: storage)
+        dic = torch.load(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'weights/resnet101_caffeProto.pth'),
+                         map_location=lambda storage, loc: storage)
         self.resnet.load_state_dict(dic, strict=False)
 
     def _initialize_weights(self):
@@ -185,8 +190,6 @@ class ImageHelper:
         return I
 
 
-
-
 def extract_features(dataset, image_helper, net, gpu_num):
     dim_features = 2048
     N_queries = dataset.N_queries
@@ -207,27 +210,27 @@ def extract_features(dataset, image_helper, net, gpu_num):
 
 
 if __name__ == '__main__':
-
     gpu_num = 0
     S = 1024  # Maximum dimension
 
-    weight_path = 'weights/ContextAwareRegionalAttention_weights.pth'
+    # weight_path = 'weights/ContextAwareRegionalAttention_weights.pth'
+    weight_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                               'weights/ContextAwareRegionalAttention_weights.pth')
     means = np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :, None, None]
 
     net = OurNet()
     net.eval()
-    net = net.cuda(gpu_num)
+    # net = net.cuda(gpu_num)
 
     # Load the trained weights of regional attention network
-    dic = torch.load(weight_path,map_location = 'cpu')
+    dic = torch.load(weight_path, map_location='cpu')
     net.region_attention.load_state_dict(dic, strict=True)
 
     image_helper = ImageHelper(S, means)
 
-    I = image_helper.load_and_prepare_image('test.jpg')
+    I = image_helper.load_and_prepare_image('../test/1/163-1.jpg')
 
     feat = image_helper.get_features(I, net, gpu_num)
     print(feat)
     # Extract features
     # features_queries, features_dataset = extract_features(dataset, image_helper, net, gpu_num)
-

@@ -123,7 +123,7 @@ class DirDataset(Dataset):
     def __getitem__(self, index):
         try:
             image_path = self.image_paths[index]
-            if self.args == 'attention':
+            if self.args.model == 'attention':
                 return Variable(torch.from_numpy(self.image_helper.load_and_prepare_image(image_path))), image_path
 
             trans = get_transform(self.args)
