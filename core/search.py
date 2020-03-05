@@ -18,7 +18,13 @@ import faiss
 import logging
 from lib.log import log
 from core.helper import extract
-from core.preprocess import get_transform
+from core.preprocess import get_transform, ImageHelper
+
+import torch
+from torch.autograd import Variable
+
+image_helper = ImageHelper(1024, np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
+                                 None, None])
 
 
 class Search:
@@ -61,7 +67,15 @@ class Search:
             # return x / np.sqrt((x ** 2).sum(-1))[..., np.newaxis]
 
     def search(self, image_path, recall_num):
-        img = get_transform(self.args)(image_path)
+
+        if self.args.model == 'attention':
+            img = Variable(torch.from_numpy(image_helper.load_and_prepare_image(image_path)))
+        else:
+
+            trans = get_transform(self.args)
+            img = trans(image_path)
+
+        # img = get_transform(self.args)(image_path)
         query = extract(self.model, img, self.args, self.device)
         if self.args.pca:
             feature = self.pca.transform(np.array(query, dtype=np.float32))[0]

@@ -120,6 +120,9 @@ class DirDataset(Dataset):
                                         np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
                                         None, None])
 
+
+
+
     def __getitem__(self, index):
         try:
             image_path = self.image_paths[index]
