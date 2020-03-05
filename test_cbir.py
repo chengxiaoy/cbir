@@ -53,4 +53,4 @@ if __name__ == '__main__':
     print(feature1)
     model = get_model(args.model).to(device)
     search = Search(model, "10vectors_.pkl", "none", device, args)
-    print(search.search("/Users/tezign/PycharmProjects/cbir/bgy_test/1/137-1.jpg", 10))
+    print(search.search("../bgy_test/1/137-1.jpg", 10))
