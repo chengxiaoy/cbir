@@ -45,7 +45,7 @@ def get_feature(args, image_path):
 
 
 if __name__ == '__main__':
-    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10"})
+    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10",'rerank':"none"})
     feature2 = get_feature(args, "../bgy_test/2/137-2.jpg")
     feature1 = get_feature(args, "../bgy_test/1/137-1.jpg")
     print(np.dot(feature2[0], feature1[0]))
