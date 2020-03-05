@@ -6,6 +6,7 @@ from attrdict import AttrDict
 from core.helper import extract
 from core.preprocess import *
 from core.network import get_model
+from core.search import Search
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -44,7 +45,12 @@ def get_feature(args, image_path):
 
 
 if __name__ == '__main__':
-    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False})
-    feature2 = get_feature(args,"/Users/tezign/PycharmProjects/cbir/bgy_test/2/10-2.jpg")
-    feature1 = get_feature(args,"/Users/tezign/PycharmProjects/cbir/bgy_test/1/10-1.jpg")
-    print(np.dot(feature2[0],feature1[0]))
+    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10"})
+    feature2 = get_feature(args, "/Users/tezign/PycharmProjects/cbir/bgy_test/2/137-2.jpg")
+    feature1 = get_feature(args, "/Users/tezign/PycharmProjects/cbir/bgy_test/1/137-1.jpg")
+    print(np.dot(feature2[0], feature1[0]))
+    print("===feature1====")
+    print(feature1)
+    model = get_model(args.model).to(device)
+    search = Search(model, "10vectors_.pkl", "none", args, device)
+    print(search.search("/Users/tezign/PycharmProjects/cbir/bgy_test/1/137-1.jpg",10))
