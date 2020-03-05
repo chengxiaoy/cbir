@@ -38,6 +38,8 @@ def get_feature(args, image_path):
         trans = get_transform(args)
         img = trans(image_path)
     model = get_model(args.model)
+    model.to(device)
+    img.to(device)
     return extract(model, img, args, device)
 
 
