@@ -56,6 +56,8 @@ pool_result = []
 for i in range(round(args.num / slice_n)):
     r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
     pool_result.append(r)
+p.close()
+p.join()
 
 for r in pool_result:
     vectors, paths_ = r.get()
