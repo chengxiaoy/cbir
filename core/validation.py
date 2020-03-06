@@ -9,6 +9,8 @@ from sklearn.preprocessing import normalize
 import joblib
 import numpy as np
 from preprecess.file_helper import get_image_paths
+import torch
+from core.network import get_model
 
 
 def res_show(res_file):
@@ -27,9 +29,13 @@ def res_show(res_file):
         eva.show(query, query_res[query][0], query_res[query][1], dir_name)
 
 
-def valid(model, device, args, features_path, pca_path):
+def valid(args, features_path, pca_path):
+    device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+
+    model = get_model(args.model)
+    model = model.to(device)
     # add the need retrieval pic
-    data_set = get_dataset('../bgy_test/2', 100, args)
+    data_set = get_dataset('../bgy_test/2', 0, 100, args)
     data_loader = get_dataloader(data_set)
 
     vectors_, paths_ = batch_extract(model, data_loader, device, args)

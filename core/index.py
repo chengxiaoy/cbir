@@ -14,6 +14,8 @@ from core.search import Search
 import numpy as np
 from preprecess.file_helper import get_image_paths
 from core.validation import valid
+from core.helper import partIndex
+from multiprocessing import Pool
 
 parser = argparse.ArgumentParser(description="index images")
 
@@ -36,10 +38,6 @@ parser.add_argument('--id', '-i', default="5")
 
 args = parser.parse_args()
 print(json.dumps(args.__dict__))
-device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
-
-model = get_model(args.model)
-model = model.to(device)
 
 # if args.encoder == 'hew':
 #     data_set = get_dataset(args.dir, 20000, args=args)
@@ -47,12 +45,29 @@ model = model.to(device)
 #     mean_vector = get_mean(model, data_loader, device)
 #     joblib.dump(mean_vector, 'hew_means.pkl')
 
+
+slice_n = 10000
 # index the file
+features = np.zeros((1, 2048))
+paths = []
 
-data_set = get_dataset(args.dir, args.num, args=args)
-data_loader = get_dataloader(data_set)
+p = Pool(round(args.num / slice_n))
+pool_result = []
+for i in range(round(args.num / slice_n)):
+    r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
+    pool_result.append(r)
 
-vectors, paths = batch_extract(model, data_loader, device, args)
+for r in pool_result:
+    vectors, paths_ = r.get()
+    features = np.concatenate((features, vectors)).astype(np.float32)
+    paths.extend(paths_)
+
+features = features[1:]
+
+#
+# data_set = get_dataset(args.dir,0, args.num, args=args)
+# data_loader = get_dataloader(data_set)
+# vectors, paths = batch_extract(model, data_loader, device, args)
 # vectors, paths = joblib.load("vectors.pkl")
 #
 if args.pca:
@@ -63,7 +78,7 @@ if args.pca:
     joblib.dump(pca, args.id + "pca.pkl")
 joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
-mAP = valid(model, args=args, device=device, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
+mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
 
 print("map is {}".format(mAP))
 

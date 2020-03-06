@@ -6,6 +6,19 @@ from core.layers.functional import get_potential_inv_re, create_mean
 import torch
 import numpy as np
 from sklearn.preprocessing import normalize
+from core.network import get_model
+from core.preprocess import get_dataloader,get_dataset
+
+
+def partIndex(args, start_n, end_n):
+    device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+
+    model = get_model(args.model)
+    model = model.to(device)
+    data_set = get_dataset(args.dir, start_n, end_n, args=args)
+    data_loader = get_dataloader(data_set)
+    vectors, paths = batch_extract(model, data_loader, device, args)
+    return vectors, paths
 
 
 def get_mean(model, data_loader, device):
