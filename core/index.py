@@ -15,8 +15,8 @@ import numpy as np
 from preprecess.file_helper import get_image_paths
 from core.validation import valid
 from core.helper import partIndex
-from multiprocessing import Pool
-# from torch.multiprocessing import Pool
+# from multiprocessing import Pool
+from torch.multiprocessing import Pool
 import multiprocessing as mp
 
 
@@ -40,7 +40,6 @@ parser.add_argument("--rerank", '-k', default='none')
 parser.add_argument('--id', '-i', default="5")
 
 args = parser.parse_args()
-print(json.dumps(args.__dict__))
 
 # if args.encoder == 'hew':
 #     data_set = get_dataset(args.dir, 20000, args=args)
@@ -50,6 +49,7 @@ print(json.dumps(args.__dict__))
 
 if __name__ == '__main__':
     mp.set_start_method('spawn')
+    print(json.dumps(args.__dict__))
 
     slice_n = 100000
     # index the file
