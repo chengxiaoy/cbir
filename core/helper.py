@@ -22,7 +22,7 @@ def get_mean(model, data_loader, device):
 
                 fm = get_feature_map(img, model)
                 fm_list.append(fm.squeeze(0).detach().cpu().numpy().T)
-                print("get fm cost {} s".format(time.time() - since))
+                # print("get fm cost {} s".format(time.time() - since))
 
 
             except Exception as e:
@@ -39,7 +39,7 @@ def batch_extract(model, data_loader, device, args):
         for path, img in zip(paths, imgs):
             try:
                 if path == 'error_path':
-                    print("get {} image feature failed!".format(path))
+                    # print("get {} image feature failed!".format(path))
                     continue
                 since = time.time()
 
@@ -51,7 +51,7 @@ def batch_extract(model, data_loader, device, args):
                 paths = [path] * len(vectors)
                 indexed_vectors.extend(vectors)
                 indexed_ids.extend(paths)
-                print("cost {} s".format(time.time() - since))
+                # print("cost {} s".format(time.time() - since))
             except Exception as e:
                 print(e)
 
