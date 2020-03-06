@@ -18,7 +18,7 @@ from core.validation import valid
 parser = argparse.ArgumentParser(description="index images")
 
 parser.add_argument("--dir", '-d', default="../bgy_test/1", required=False, help="the dir need to be indexed")
-parser.add_argument("--num", '-n', default=200000, required=False)
+parser.add_argument("--num", '-n', default=200000, required=False, type=int)
 parser.add_argument("--gpu", '-g', default=0, choices=[0, 1], type=int)
 parser.add_argument("--encoder", '-e', default='mac', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
@@ -64,8 +64,6 @@ if args.pca:
 joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
 mAP = valid(model, args=args, device=device, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
-
-
 
 print("map is {}".format(mAP))
 
