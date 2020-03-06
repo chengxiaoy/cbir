@@ -46,7 +46,7 @@ print(json.dumps(args.__dict__))
 #     joblib.dump(mean_vector, 'hew_means.pkl')
 
 
-slice_n = 10000
+slice_n = 100000
 # index the file
 features = np.zeros((1, 2048))
 paths = []
