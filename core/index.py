@@ -18,7 +18,6 @@ from core.helper import partIndex
 from multiprocessing import Pool
 # from torch.multiprocessing import Pool
 import multiprocessing as mp
-mp.set_start_method('spawn')
 
 
 parser = argparse.ArgumentParser(description="index images")
@@ -49,46 +48,48 @@ print(json.dumps(args.__dict__))
 #     mean_vector = get_mean(model, data_loader, device)
 #     joblib.dump(mean_vector, 'hew_means.pkl')
 
+if __name__ == '__main__':
+    mp.set_start_method('spawn')
 
-slice_n = 100000
-# index the file
-features = np.zeros((1, 2048))
-paths = []
+    slice_n = 100000
+    # index the file
+    features = np.zeros((1, 2048))
+    paths = []
 
-p = Pool(round(args.num / slice_n))
+    p = Pool(round(args.num / slice_n))
 
-pool_result = []
-for i in range(round(args.num / slice_n)):
+    pool_result = []
+    for i in range(round(args.num / slice_n)):
 
-    r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
-    pool_result.append(r)
-p.close()
-p.join()
+        r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
+        pool_result.append(r)
+    p.close()
+    p.join()
 
-for r in pool_result:
-    vectors, paths_ = r.get()
-    features = np.concatenate((features, vectors)).astype(np.float32)
-    paths.extend(paths_)
+    for r in pool_result:
+        vectors, paths_ = r.get()
+        features = np.concatenate((features, vectors)).astype(np.float32)
+        paths.extend(paths_)
 
-features = features[1:]
+    features = features[1:]
 
-#
-# data_set = get_dataset(args.dir,0, args.num, args=args)
-# data_loader = get_dataloader(data_set)
-# vectors, paths = batch_extract(model, data_loader, device, args)
-# vectors, paths = joblib.load("vectors.pkl")
-#
-if args.pca:
-    pca = PCA(512, whiten=True)
-    pca.fit(vectors[:20000])
-    vectors = pca.transform(vectors)
+    #
+    # data_set = get_dataset(args.dir,0, args.num, args=args)
+    # data_loader = get_dataloader(data_set)
+    # vectors, paths = batch_extract(model, data_loader, device, args)
+    # vectors, paths = joblib.load("vectors.pkl")
+    #
+    if args.pca:
+        pca = PCA(512, whiten=True)
+        pca.fit(vectors[:20000])
+        vectors = pca.transform(vectors)
 
-    joblib.dump(pca, args.id + "pca.pkl")
-joblib.dump((vectors, paths), args.id + "vectors.pkl")
+        joblib.dump(pca, args.id + "pca.pkl")
+    joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
-mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
+    mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
 
-print("map is {}".format(mAP))
+    print("map is {}".format(mAP))
 
 # 1 resnet50 + rpool + mac + sum
 # 2 dla34 + rpool + mac +sum
