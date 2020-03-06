@@ -11,20 +11,7 @@ from core.search import Search
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-def res_show(res_file):
-    eva = Evaluate("error.jpg")
 
-    query_res = joblib.load(res_file)
-    f_name = res_file.split('/')[-1].split('.')[0]
-    mAP = eva.mAP(query_res)
-    precision = eva.precision(query_res, 10)
-
-    dir_name = "/data/User/chengying/" + f_name + "_map{}_preci{}".format(round(mAP, 2), precision) + "/"
-    if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
-
-    for query in query_res:
-        eva.show(query, query_res[query][0], query_res[query][1], dir_name)
 
 
 image_helper = ImageHelper(1024, np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,

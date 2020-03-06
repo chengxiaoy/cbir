@@ -41,29 +41,31 @@ device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else 
 model = get_model(args.model)
 model = model.to(device)
 
-if args.encoder == 'hew':
-    data_set = get_dataset(args.dir, 20000, args=args)
-    data_loader = get_dataloader(data_set)
-    mean_vector = get_mean(model, data_loader, device)
-    joblib.dump(mean_vector, 'hew_means.pkl')
+# if args.encoder == 'hew':
+#     data_set = get_dataset(args.dir, 20000, args=args)
+#     data_loader = get_dataloader(data_set)
+#     mean_vector = get_mean(model, data_loader, device)
+#     joblib.dump(mean_vector, 'hew_means.pkl')
 
 # index the file
 
-# data_set = get_dataset(args.dir, args.num, args=args)
-# data_loader = get_dataloader(data_set)
+data_set = get_dataset(args.dir, args.num, args=args)
+data_loader = get_dataloader(data_set)
+
+vectors, paths = batch_extract(model, data_loader, device, args)
+# vectors, paths = joblib.load("vectors.pkl")
 #
-# vectors, paths = batch_extract(model, data_loader, device, args)
-# # vectors, paths = joblib.load("vectors.pkl")
-# #
-# if args.pca:
-#     pca = PCA(512, whiten=True)
-#     pca.fit(vectors[:20000])
-#     vectors = pca.transform(vectors)
-#
-#     joblib.dump(pca, args.id + "pca.pkl")
-# joblib.dump((vectors, paths), args.id + "vectors.pkl")
+if args.pca:
+    pca = PCA(512, whiten=True)
+    pca.fit(vectors[:20000])
+    vectors = pca.transform(vectors)
+
+    joblib.dump(pca, args.id + "pca.pkl")
+joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
 mAP = valid(model, args=args, device=device, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
+
+
 
 print("map is {}".format(mAP))
 
@@ -77,3 +79,4 @@ print("map is {}".format(mAP))
 # 8 resnet101 + rpool + mac + sum
 # 9 resnet50 + rpool + gem + sum
 # 10 attention
+# 11 resnet50 + hew + her + 50W

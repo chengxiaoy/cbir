@@ -11,6 +11,22 @@ import numpy as np
 from preprecess.file_helper import get_image_paths
 
 
+def res_show(res_file):
+    eva = Evaluate("error.jpg")
+
+    query_res = joblib.load(res_file)
+    f_name = res_file.split('/')[-1].split('.')[0]
+    mAP = eva.mAP(query_res)
+    precision = eva.precision(query_res, 10)
+
+    dir_name = "/data/User/chengying/" + f_name + "_map{}_preci{}".format(round(mAP, 2), precision) + "/"
+    if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
+
+    for query in query_res:
+        eva.show(query, query_res[query][0], query_res[query][1], dir_name)
+
+
 def valid(model, device, args, features_path, pca_path):
     # add the need retrieval pic
     data_set = get_dataset('../bgy_test/2', 100, args)
@@ -41,6 +57,8 @@ def valid(model, device, args, features_path, pca_path):
 
     eva = Evaluate("error.jpg")
     mAP = eva.mAP(query_res)
+
+    res_show(args.id + "query_res.pkl")
     return mAP
 
 
