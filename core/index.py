@@ -15,7 +15,8 @@ import numpy as np
 from preprecess.file_helper import get_image_paths
 from core.validation import valid
 from core.helper import partIndex
-from multiprocessing import Pool
+# from multiprocessing import Pool
+from torch.multiprocessing import Pool
 
 parser = argparse.ArgumentParser(description="index images")
 
@@ -52,8 +53,10 @@ features = np.zeros((1, 2048))
 paths = []
 
 p = Pool(round(args.num / slice_n))
+
 pool_result = []
 for i in range(round(args.num / slice_n)):
+
     r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
     pool_result.append(r)
 p.close()
