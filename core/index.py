@@ -15,8 +15,11 @@ import numpy as np
 from preprecess.file_helper import get_image_paths
 from core.validation import valid
 from core.helper import partIndex
-# from multiprocessing import Pool
-from torch.multiprocessing import Pool
+from multiprocessing import Pool
+# from torch.multiprocessing import Pool
+import multiprocessing as mp
+mp.set_start_method('spawn')
+
 
 parser = argparse.ArgumentParser(description="index images")
 
