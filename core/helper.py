@@ -1,5 +1,5 @@
 from core.encode import get_feature_map, extract_vector
-
+from tqdm import tqdm
 import time
 from sklearn.decomposition import PCA
 from core.layers.functional import get_potential_inv_re, create_mean
@@ -35,7 +35,7 @@ def batch_extract(model, data_loader, device, args):
     indexed_vectors = []
     indexed_ids = []
 
-    for imgs, paths in data_loader:
+    for imgs, paths in tqdm(data_loader):
         for path, img in zip(paths, imgs):
             try:
                 if path == 'error_path':
