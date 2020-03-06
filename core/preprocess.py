@@ -174,7 +174,7 @@ def get_dataloader(dataset):
     :return:
     """
     return DataLoader(
-        dataset, batch_size=16, shuffle=True,
-        num_workers=8, pin_memory=False, sampler=None,
+        dataset, batch_size=8, shuffle=True,
+        num_workers=4, pin_memory=True, sampler=None,
         drop_last=False, collate_fn=collate_tuples
     )
