@@ -115,7 +115,7 @@ class DirDataset(Dataset):
         self.root_dir = root_dir
         self.start_n = start_n
         self.end_n = end_n
-        self.image_paths = self.get_image_paths(self.root_dir)
+        self.image_paths = self.get_image_paths(self.root_dir)[self.start_n:self.end_n]
         self.args = args
         self.image_helper = ImageHelper(1024,
                                         np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
@@ -146,7 +146,7 @@ class DirDataset(Dataset):
                 image_path_list.extend(self.get_image_paths(file))
 
         image_path_list = sorted(image_path_list)
-        return image_path_list[self.start_n:self.end_n]
+        return image_path_list
 
 
 def get_dataset(root_dir, start_n, end_n, args):
