@@ -51,32 +51,35 @@ if __name__ == '__main__':
     mp.set_start_method('spawn')
     print(json.dumps(args.__dict__))
 
-    slice_n = 100000
-    # index the file
-    features = np.zeros((1, 2048))
-    paths = []
-
-    p = Pool(round(args.num / slice_n))
-
-    pool_result = []
-    for i in range(round(args.num / slice_n)):
-
-        r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
-        pool_result.append(r)
-    p.close()
-    p.join()
-
-    for r in pool_result:
-        vectors, paths_ = r.get()
-        features = np.concatenate((features, vectors)).astype(np.float32)
-        paths.extend(paths_)
-
-    features = features[1:]
+    # slice_n = 100000
+    # # index the file
+    # features = np.zeros((1, 2048))
+    # paths = []
+    #
+    # p = Pool(round(args.num / slice_n))
+    #
+    # pool_result = []
+    # for i in range(round(args.num / slice_n)):
+    #
+    #     r = p.apply_async(partIndex, (args, i * slice_n, (i + 1) * slice_n,))
+    #     pool_result.append(r)
+    # p.close()
+    # p.join()
+    #
+    # for r in pool_result:
+    #     vectors, paths_ = r.get()
+    #     features = np.concatenate((features, vectors)).astype(np.float32)
+    #     paths.extend(paths_)
+    #
+    # features = features[1:]
 
     #
-    # data_set = get_dataset(args.dir,0, args.num, args=args)
-    # data_loader = get_dataloader(data_set)
-    # vectors, paths = batch_extract(model, data_loader, device, args)
+    model = get_model(args.model)
+    device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+
+    data_set = get_dataset(args.dir,0, args.num, args=args)
+    data_loader = get_dataloader(data_set)
+    vectors, paths = batch_extract(model, data_loader, device, args)
     # vectors, paths = joblib.load("vectors.pkl")
     #
     if args.pca:
