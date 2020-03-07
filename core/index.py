@@ -74,8 +74,9 @@ if __name__ == '__main__':
     # features = features[1:]
 
     #
-    model = get_model(args.model)
     device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
+
+    model = get_model(args.model).to(device)
 
     data_set = get_dataset(args.dir,0, args.num, args=args)
     data_loader = get_dataloader(data_set)
