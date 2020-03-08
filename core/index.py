@@ -19,7 +19,6 @@ from core.helper import partIndex
 from torch.multiprocessing import Pool
 import multiprocessing as mp
 
-
 parser = argparse.ArgumentParser(description="index images")
 
 parser.add_argument("--dir", '-d', default="../bgy_test/1", required=False, help="the dir need to be indexed")
@@ -78,18 +77,18 @@ if __name__ == '__main__':
 
     model = get_model(args.model).to(device)
 
-    data_set = get_dataset(args.dir,0, args.num, args=args)
-    data_loader = get_dataloader(data_set)
-    vectors, paths = batch_extract(model, data_loader, device, args)
-    # vectors, paths = joblib.load("vectors.pkl")
+    # data_set = get_dataset(args.dir, 0, args.num, args=args)
+    # data_loader = get_dataloader(data_set)
+    # vectors, paths = batch_extract(model, data_loader, device, args)
+    # # vectors, paths = joblib.load("vectors.pkl")
+    # #
+    # if args.pca:
+    #     pca = PCA(512, whiten=True)
+    #     pca.fit(vectors[:20000])
+    #     vectors = pca.transform(vectors)
     #
-    if args.pca:
-        pca = PCA(512, whiten=True)
-        pca.fit(vectors[:20000])
-        vectors = pca.transform(vectors)
-
-        joblib.dump(pca, args.id + "pca.pkl")
-    joblib.dump((vectors, paths), args.id + "vectors.pkl")
+    #     joblib.dump(pca, args.id + "pca.pkl")
+    # joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
     mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
 
@@ -105,4 +104,5 @@ if __name__ == '__main__':
 # 8 resnet101 + rpool + mac + sum
 # 9 resnet50 + rpool + gem + sum
 # 10 attention
-# 11 resnet50 + hew + her + 50W
+# 12 resnet50 + hew + her + 50W
+# 13 resnet50 +  rpool + mac + sum + ms + 50W
