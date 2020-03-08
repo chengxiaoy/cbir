@@ -84,7 +84,7 @@ class Search:
             feature = query[0]
 
         if self.args.rerank == 'her':
-            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), 2000)
+            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), 1000)
         else:
             D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
 
