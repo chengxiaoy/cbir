@@ -166,7 +166,7 @@ def HeR(ranks, ids, qvec):
     weights = get_potential_inv_re(a, z)
     # descend
     indexs = np.argsort(-weights)
-    print("her cost {} s".format(round(time() - since)))
+    print("her cost {} s".format(round(time() - since,2)))
     return ids[indexs]
 
 
