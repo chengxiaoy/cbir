@@ -64,7 +64,7 @@ def valid(args, features_path, pca_path):
     eva = Evaluate("error.jpg")
     mAP = eva.mAP(query_res)
 
-    res_show(args.id + "query_res.pkl")
+    # res_show(args.id + "query_res.pkl")
     return mAP
 
 
