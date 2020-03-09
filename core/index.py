@@ -80,15 +80,15 @@ if __name__ == '__main__':
     # data_set = get_dataset(args.dir, 0, args.num, args=args)
     # data_loader = get_dataloader(data_set)
     # vectors, paths = batch_extract(model, data_loader, device, args)
-    # # vectors, paths = joblib.load("vectors.pkl")
+    vectors, paths = joblib.load(args.id +"vectors.pkl")
     # #
-    # if args.pca:
-    #     pca = PCA(512, whiten=True)
-    #     pca.fit(vectors[:20000])
-    #     vectors = pca.transform(vectors)
-    #
-    #     joblib.dump(pca, args.id + "pca.pkl")
-    # joblib.dump((vectors, paths), args.id + "vectors.pkl")
+    if args.pca:
+        pca = PCA(512, whiten=True)
+        pca.fit(vectors[:20000])
+        vectors = pca.transform(vectors)
+
+        joblib.dump(pca, args.id + "pca.pkl")
+    joblib.dump((vectors, paths), args.id + "vectors.pkl")
 
     mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
 
