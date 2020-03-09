@@ -19,9 +19,10 @@ import logging
 from lib.log import log
 from core.helper import extract
 from core.preprocess import get_transform, ImageHelper
-
+from core.diffussion import *
 import torch
 from torch.autograd import Variable
+from sklearn.preprocessing import normalize
 
 image_helper = ImageHelper(1024, np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
                                  None, None])
@@ -78,17 +79,25 @@ class Search:
         # img = get_transform(self.args)(image_path)
         query = extract(self.model, img, self.args, self.device)
         if self.args.pca:
-            feature = self.pca.transform(np.array(query, dtype=np.float32))[0]
+            feature = self.pca.transform(np.array(query, dtype=np.float32))
             feature = self.normalize(feature)
         else:
-            feature = query[0]
+            feature = query
 
         if self.args.rerank == 'her':
-            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), 1000)
+            D, I = self.invert_index.search(np.array(feature, dtype=np.float32), 1000)
         else:
-            D, I = self.invert_index.search(np.array([feature], dtype=np.float32), recall_num)
+            D, I = self.invert_index.search(np.array(feature, dtype=np.float32), recall_num)
 
-        idxs, coarse_scores = I[0].tolist(), D[0].tolist()
+        if len(feature) == 1:
+            idxs, coarse_scores = I[0].tolist(), D[0].tolist()
+        else:
+            idxs = []
+            for ii in range(len(I)):
+                sub_idxs, _ = I[ii].tolist(), D[ii].tolist()
+                idxs.extend(sub_idxs)
+            idxs = list(set(idxs))
+
         paths = []
         for idx in idxs:
             paths.append(self.paths[idx])
@@ -96,8 +105,11 @@ class Search:
 
         if self.args.rerank == 'her':
             features = self.features[idxs]
-            rerank_paths = HeR(features.T, paths, feature)
-            return rerank_paths[:recall_num], coarse_scores[:recall_num]
+            rerank_paths, scores = HeR(features.T, paths, feature)
+            return rerank_paths[:recall_num], scores[:recall_num]
+        elif self.args.aggregate == 'gmm':
+            features = self.features[idxs]
+            return dfs(feature, features, paths)
 
         return paths, coarse_scores
 
@@ -147,6 +159,46 @@ def rerank(query_id, recall_ids, recall_features):
     pass
 
 
+def dfs(query_feature, index_features, indexs):
+    # rerank for the index_paths
+    Q = np.array(query_feature).T
+    X = index_features.T
+    Wn = buildGraph(X)
+    rank, scores = get_diffusion_rank(Wn, X, Q)
+    indexs = np.array(indexs)[rank[:, 0]]
+    scores = scores[rank[:, 0], 0]
+    return indexs, scores
+
+
+def buildGraph(X):
+    K = 50  # approx 50 mutual nns
+
+    A = np.dot(X.T, X)
+    W = sim_kernel(A).T
+    W = topK_W(W, K)
+    Wn = normalize_connection_graph(W)
+    return Wn
+
+
+def get_diffusion_rank(Wn, X, Q):
+    QUERYKNN = 5
+    alpha = 0.9
+    # perform search
+    print("begin dot")
+    sim = np.dot(X.T, Q)
+    qsim = sim_kernel(sim).T
+
+    sortidxs = np.argsort(-qsim, axis=1)
+    for i in range(len(qsim)):
+        qsim[i, sortidxs[i, QUERYKNN:]] = 0
+
+    qsim = sim_kernel(qsim)
+    # fast_spectral_ranks = fsr_rankR(qsim, Wn, alpha, 2000)
+    # return fast_spectral_ranks
+    cg_ranks, scores = cg_diffusion(qsim, Wn, alpha)
+    return cg_ranks, scores
+
+
 def HeR(ranks, ids, qvec):
     """
     ranks is top N rank vectors of C*N shape
@@ -166,8 +218,8 @@ def HeR(ranks, ids, qvec):
     weights = get_potential_inv_re(a, z)
     # descend
     indexs = np.argsort(-weights)
-    print("her cost {} s".format(round(time() - since,2)))
-    return ids[indexs]
+    print("her cost {} s".format(round(time() - since, 2)))
+    return ids[indexs], sorted(weights, reverse=True)
 
 
 def qe(ranks, ids, qvec):
@@ -182,3 +234,14 @@ def HeR_qe(ranks, ids, qvec):
         qvec = qvec + ranks[i]
     qvec = qvec / 11
     return HeR_qe(ranks, ids, qvec)
+
+
+if __name__ == '__main__':
+    query_feature = np.random.rand(4, 512)
+    query_feature = np.concatenate([query_feature, query_feature], axis=0)
+    query_feature = normalize(query_feature)
+    indexed_features = np.random.rand(500, 512)
+    indexed_features = normalize(indexed_features)
+
+    indexs = dfs(query_feature, indexed_features, np.array(list(range(500))))
+    print(indexs)

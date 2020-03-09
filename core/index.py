@@ -106,3 +106,5 @@ if __name__ == '__main__':
 # 10 attention
 # 12 resnet50 + hew + her + 50W
 # 13 resnet50 +  rpool + mac + sum + ms + 50W
+# 13 attention + pca + 50W
+# 14 resnet + pca + gmm + 1W
