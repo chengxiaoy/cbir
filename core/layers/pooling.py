@@ -110,8 +110,9 @@ class Rpool(nn.Module):
             # rvecs -> sumpool -> norm
             o = normalize(np.sum(o.detach().cpu().numpy(), axis=0).reshape(1, -1))
         elif aggregate == 'gmm':
-            o = LF.gmm(o.detach().cpu().numpy())
-            o = normalize(o)
+            o_ = o.detach().cpu().numpy()
+            o = LF.gmm(o_[1:])
+            o = normalize(np.concatenate([o_[0].reshape(1, -1), o], axis=0))
         elif aggregate == 'gmp':
             o = LF.gmp(o.detach().cpu().numpy().T)
             o = normalize(o.reshape(1, -1))
