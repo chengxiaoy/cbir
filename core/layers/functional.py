@@ -278,12 +278,14 @@ def get_potential_inv_re(a, z):
 
 
 if __name__ == '__main__':
-    m1 = np.random.randn(512, 20).astype(np.float32)
+    since = time.time()
+    m1 = np.random.randn(2048, 20).astype(np.float32)
     gmp1 = gmp(m1.copy(), lamb=10, cgd=False)
+    print(time.time()-since)
     # gmp2 = gmp(m1.copy(), lamb=10, cgd=True)
     # print(gmp1)
     # print(gmp2)
 
     # heat diffusion
 
-    weight_Heat(np.random.randn(5, 5, 16), np.random.randn(16))
+    # weight_Heat(np.random.randn(5, 5, 16), np.random.randn(16))
