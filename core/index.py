@@ -18,6 +18,8 @@ from core.helper import partIndex
 # from multiprocessing import Pool
 from torch.multiprocessing import Pool
 import multiprocessing as mp
+import math
+import os
 
 parser = argparse.ArgumentParser(description="index images")
 
@@ -74,23 +76,34 @@ if __name__ == '__main__':
 
     #
     device = torch.device("cuda:" + str(args.gpu) if torch.cuda.is_available() else "cpu")
-
     model = get_model(args.model).to(device)
+    slice_num = 100000
 
-    data_set = get_dataset(args.dir, 0, args.num, args=args)
-    data_loader = get_dataloader(data_set)
-    vectors, paths = batch_extract(model, data_loader, device, args)
-    # vectors, paths = joblib.load(args.id +"vectors.pkl")
-    # #
-    if args.pca:
-        pca = PCA(512, whiten=True)
-        pca.fit(vectors[:20000])
-        vectors = pca.transform(vectors)
+    pca_path = args.id + "pca.pkl"
+    vectors_path = args.id + "vectors.pkl"
+    for i in range(math.ceil(args.num / slice_num)):
+        data_set = get_dataset(args.dir, i * slice_num, (i + 1) * slice_num, args=args)
+        data_loader = get_dataloader(data_set)
+        vectors, paths = batch_extract(model, data_loader, device, args)
+        # vectors, paths = joblib.load(args.id +"vectors.pkl")
+        # #
+        if args.pca:
+            if os.path.exists(pca_path):
+                pca = joblib.load(pca_path)
+            else:
+                pca = PCA(512, whiten=True)
+                pca.fit(vectors[:20000])
+            vectors = pca.transform(vectors)
 
-        joblib.dump(pca, args.id + "pca.pkl")
-    joblib.dump((vectors, paths), args.id + "vectors.pkl")
+            joblib.dump(pca, pca_path)
+        if os.path.exists(vectors_path):
+            vectors_, paths_ = joblib.load(vectors_path)
+            vectors = np.concatenate((vectors, vectors_)).astype(np.float32)
+            paths.extend(paths_)
 
-    mAP = valid(args=args, features_path=args.id + "vectors.pkl", pca_path=args.id + 'pca.pkl')
+        joblib.dump((vectors, paths),vectors_path)
+
+    mAP = valid(args=args, features_path=vectors_path, pca_path=pca_path)
 
     print("map is {}".format(mAP))
 
