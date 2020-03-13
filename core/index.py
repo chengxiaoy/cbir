@@ -29,7 +29,7 @@ parser.add_argument("--gpu", '-g', default=0, choices=[0, 1], type=int)
 parser.add_argument("--encoder", '-e', default='mac', required=False,
                     choices=['gem', 'crow', 'spoc', 'mac', 'hew'],
                     help='the encoder method for feature_map to vector')
-parser.add_argument("--aggregate", '-a', default='gmm', required=False, choices=['sum', 'gmm', 'gmp'])
+parser.add_argument("--aggregate", '-a', default='sum', required=False, choices=['sum', 'gmm', 'gmp'])
 parser.add_argument("--rpool", '-r', action='store_false', help="region pool")
 parser.add_argument("--model", '-m', default='resnet50', required=False,
                     choices=['resnet50', 'resnet101', 'resnet34', 'dla34', 'dla102x', 'eff-net', 'attention'],
