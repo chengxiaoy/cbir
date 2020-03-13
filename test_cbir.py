@@ -11,6 +11,7 @@ import argparse
 from preprecess.file_helper import get_image_paths
 from core.network import get_model
 from sklearn.preprocessing import normalize
+from sklearn.metrics import pairwise_distances
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -84,6 +85,7 @@ if __name__ == '__main__':
     feature1 = pca_15.transform(feature1)
     feature1 = normalize(feature1)
     print(np.dot(feature2[0], feature1[0]))
+    print(pairwise_distances(feature2, feature1))
     # print("===feature1====")
     # print(feature1)
     # model = get_model(args.model).to(device)
