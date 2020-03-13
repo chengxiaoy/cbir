@@ -10,6 +10,7 @@ from core.search import Search
 import argparse
 from preprecess.file_helper import get_image_paths
 from core.network import get_model
+from sklearn.preprocessing import normalize
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -72,13 +73,20 @@ def rerank_test(args):
 
 
 if __name__ == '__main__':
-    # args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10",'rerank':"none"})
-    # feature2 = get_feature(args, "../bgy_test/2/137-2.jpg")
-    # feature1 = get_feature(args, "../bgy_test/1/137-1.jpg")
-    # print(np.dot(feature2[0], feature1[0]))
+    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10",'rerank':"none"})
+    feature2 = get_feature(args, "../bgy_test/2/27-2.jpg")
+    feature1 = get_feature(args, "../bgy_test/1/27-1.jpg")
+
+    pca_10 = joblib.load('10pca.pkl')
+    pca_15 = joblib.load('15pca.pkl')
+    feature2 = pca_15.transform(feature2)
+    feature2 = normalize(feature2)
+    feature1 = pca_15.transform(feature1)
+    feature1 = normalize(feature1)
+    print(np.dot(feature2[0], feature1[0]))
     # print("===feature1====")
     # print(feature1)
     # model = get_model(args.model).to(device)
     # search = Search(model, "10vectors_.pkl", "none", device, args)
     # print(search.search("../bgy_test/1/137-1.jpg", 10))
-    res_show("data/10query_res.pkl")
+    # res_show("data/10query_res.pkl")
