@@ -130,3 +130,7 @@ if __name__ == '__main__':
 # 14 attention + pca + 50W
 # 15 attention + pca + 100W
 # 16 resnet50 +  rpool + mac + sum + ms + + pca + 100W
+# 17 attention + pca + 100W + 5wpca
+# 18 resnet50 +  rpool + mac + sum + ms + + 5Wpca + 100W
+
+

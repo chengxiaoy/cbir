@@ -47,7 +47,6 @@ def get_feature(args, image_path):
         img = trans(image_path)
     model = get_model(args.model)
     model.to(device)
-    img.to(device)
     return extract(model, img, args, device)
 
 
@@ -70,19 +69,18 @@ def rerank_test(args):
     print("map is {}".format(round(mAP)))
 
 
-
-
-
 if __name__ == '__main__':
-    args = AttrDict({"model": "attention", "pca": False, "multi_scale": False, 'id': "10",'rerank':"none"})
-    feature2 = get_feature(args, "../bgy_test/2/27-2.jpg")
-    feature1 = get_feature(args, "../bgy_test/1/27-1.jpg")
+    args = AttrDict(
+        {"model": "resnet50", "rpool": True, "aggregate": "sum", "encoder": "mac", "pca": False, "multi_scale": True,
+         'id': "10", 'rerank': "none"})
+    feature2 = get_feature(args, "bgy_test/1/116-1.jpg")
+    feature1 = get_feature(args, "bgy_test/1/27-1.jpg")
 
-    pca_10 = joblib.load('10pca.pkl')
-    pca_15 = joblib.load('15pca.pkl')
-    feature2 = pca_15.transform(feature2)
+    pca_10 = joblib.load('data/10pca.pkl')
+    pca_15 = joblib.load('data/15pca.pkl')
+    feature2 = pca_10.transform(feature2)
     feature2 = normalize(feature2)
-    feature1 = pca_15.transform(feature1)
+    feature1 = pca_10.transform(feature1)
     feature1 = normalize(feature1)
     print(np.dot(feature2[0], feature1[0]))
     print(pairwise_distances(feature2, feature1))

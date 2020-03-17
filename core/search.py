@@ -42,6 +42,13 @@ class Search:
         self.invert_index = self.get_invert_index(feature=self.features)
 
     def get_invert_index(self, feature):
+
+        # index = faiss.IndexFlatL2(len(feature[0]))  # build the index
+        # print(index.is_trained)
+        # index.add(feature)  # add vectors to the index
+        # print(index.ntotal)
+        # return index
+
         nlist = 2000
         d = len(feature[0])
         quantizer = faiss.IndexFlatL2(d)  # the other index
