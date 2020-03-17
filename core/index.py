@@ -104,7 +104,7 @@ if __name__ == '__main__':
             pca = joblib.load(pca_path)
         else:
             pca = PCA(args.vector_len, whiten=True)
-            ids = np.random.choice(len(vectors_ori), 20000)
+            ids = np.random.choice(len(vectors_ori), 50000)
             pca.fit(vectors_ori[ids])
         vectors = pca.transform(vectors_ori)
 
@@ -134,3 +134,4 @@ if __name__ == '__main__':
 # 16 resnet50 +  rpool + mac + sum + ms + + pca + 100W
 # 17 attention + pca + 100W + 5wpca
 # 18 resnet50 +  rpool + mac + sum + ms + + 5Wpca + 100W
+# 19 resnet50 +  rpool + mac + sum + ms + + 5Wpca + 100W

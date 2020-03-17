@@ -23,6 +23,7 @@ from core.diffussion import *
 import torch
 from torch.autograd import Variable
 from sklearn.preprocessing import normalize
+from core.preprocess import Pic_transform
 
 image_helper = ImageHelper(1024, np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
                                  None, None])
@@ -40,6 +41,7 @@ class Search:
         self.device = device
         self.args = args
         self.invert_index = self.get_invert_index(feature=self.features)
+        self.trans = Pic_transform(args)
 
     def get_invert_index(self, feature):
 
@@ -76,14 +78,8 @@ class Search:
 
     def search(self, image_path, recall_num):
 
-        if self.args.model == 'attention':
-            img = Variable(torch.from_numpy(image_helper.load_and_prepare_image(image_path)))
-        else:
+        img, _ = self.trans.transform(image_path)
 
-            trans = get_transform(self.args)
-            img = trans(image_path)
-
-        # img = get_transform(self.args)(image_path)
         query = extract(self.model, img, self.args, self.device)
         if self.args.pca:
             feature = self.pca.transform(np.array(query, dtype=np.float32))

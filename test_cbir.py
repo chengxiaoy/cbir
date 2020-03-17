@@ -12,6 +12,7 @@ from preprecess.file_helper import get_image_paths
 from core.network import get_model
 from sklearn.preprocessing import normalize
 from sklearn.metrics import pairwise_distances
+from core.preprocess import Pic_transform
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -39,15 +40,10 @@ image_helper = ImageHelper(1024, np.array([103.93900299, 116.77899933, 123.68000
 
 
 def get_feature(args, image_path):
-    if args.model == 'attention':
-        img = Variable(torch.from_numpy(image_helper.load_and_prepare_image(image_path)))
-    else:
-
-        trans = get_transform(args)
-        img = trans(image_path)
+    trans = Pic_transform(args)
     model = get_model(args.model)
     model.to(device)
-    return extract(model, img, args, device)
+    return extract(model, trans.transform(image_path)[0], args, device)
 
 
 def rerank_test(args):
@@ -71,7 +67,7 @@ def rerank_test(args):
 
 if __name__ == '__main__':
     args = AttrDict(
-        {"model": "resnet50", "rpool": True, "aggregate": "sum", "encoder": "mac", "pca": False, "multi_scale": True,
+        {"model": "attention", "rpool": True, "aggregate": "sum", "encoder": "mac", "pca": False, "multi_scale": True,
          'id': "10", 'rerank': "none"})
     feature2 = get_feature(args, "bgy_test/1/116-1.jpg")
     feature1 = get_feature(args, "bgy_test/1/27-1.jpg")

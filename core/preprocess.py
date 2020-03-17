@@ -110,6 +110,25 @@ def get_transform(args):
     return image_loader
 
 
+class Pic_transform():
+    def __init__(self, args):
+        self.mean = np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :, None, None]
+        self.image_helpers = [ImageHelper(x, means=self.mean) for x in [1024, 800, 550]]
+        self.args = args
+
+    def transform(self, image_path):
+        if self.args.model == 'attention':
+            if not self.args.multi_scale:
+                return Variable(
+                    torch.from_numpy(self.image_helpers[0].load_and_prepare_image(image_path))), image_path
+            else:
+                return [Variable(torch.from_numpy(x.load_and_prepare_image(image_path))) for x in
+                        self.image_helpers], image_path
+
+        trans = get_transform(self.args)
+        return trans(image_path), image_path
+
+
 class DirDataset(Dataset):
     """
     the id is the file name, the file under the dir is all need collected in to the dataset
@@ -122,18 +141,12 @@ class DirDataset(Dataset):
         self.end_n = end_n
         self.image_paths = self.get_image_paths(self.root_dir)[self.start_n:self.end_n]
         self.args = args
-        self.image_helper = ImageHelper(1024,
-                                        np.array([103.93900299, 116.77899933, 123.68000031], dtype=np.float32)[None, :,
-                                        None, None])
+        self.trans = Pic_transform(args)
 
     def __getitem__(self, index):
         try:
             image_path = self.image_paths[index]
-            if self.args.model == 'attention':
-                return Variable(torch.from_numpy(self.image_helper.load_and_prepare_image(image_path))), image_path
-
-            trans = get_transform(self.args)
-            return trans(image_path), image_path
+            return self.trans.transform(image_path)
         except Exception as e:
             return torch.zeros(0), "error_path"
 

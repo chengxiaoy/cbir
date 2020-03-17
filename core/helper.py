@@ -77,10 +77,11 @@ def extract(model, img_tensor, args, device):
         for img in img_tensor:
             img = img.to(device)
             if args.model == 'attention':
-                return model(img).cpu().detach().numpy()
-            fm = get_feature_map(img, model, args)
-            vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate, device)
-            vector_list.extend(vectors)
+                vector_list.extend(model(img).cpu().detach().numpy())
+            else:
+                fm = get_feature_map(img, model, args)
+                vectors = extract_vector(fm, args.encoder, args.rpool, args.aggregate, device)
+                vector_list.extend(vectors)
 
         return normalize(np.array([np.array(vector_list, dtype=np.float32).sum(axis=0)]))
 
