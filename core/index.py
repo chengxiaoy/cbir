@@ -83,19 +83,19 @@ if __name__ == '__main__':
     pca_path = args.id + "_"+str(args.vector_len)+"pca.pkl"
     vectors_path = args.id + "vectors.pkl"
     vectors_ori_path = args.id + "vectors_ori.pkl"
-    for i in range(math.ceil(args.num / slice_num)):
-        data_set = get_dataset(args.dir, i * slice_num, (i + 1) * slice_num, args=args)
-        data_loader = get_dataloader(data_set)
-        vectors, paths = batch_extract(model, data_loader, device, args)
-        # vectors, paths = joblib.load(args.id +"vectors.pkl")
-        # #
-
-        if os.path.exists(vectors_ori_path):
-            vectors_, paths_ = joblib.load(vectors_ori_path)
-            vectors = np.concatenate((vectors, vectors_)).astype(np.float32)
-            paths.extend(paths_)
-
-        joblib.dump((vectors, paths), vectors_ori_path)
+    # for i in range(math.ceil(args.num / slice_num)):
+    #     data_set = get_dataset(args.dir, i * slice_num, (i + 1) * slice_num, args=args)
+    #     data_loader = get_dataloader(data_set)
+    #     vectors, paths = batch_extract(model, data_loader, device, args)
+    #     # vectors, paths = joblib.load(args.id +"vectors.pkl")
+    #     # #
+    #
+    #     if os.path.exists(vectors_ori_path):
+    #         vectors_, paths_ = joblib.load(vectors_ori_path)
+    #         vectors = np.concatenate((vectors, vectors_)).astype(np.float32)
+    #         paths.extend(paths_)
+    #
+    #     joblib.dump((vectors, paths), vectors_ori_path)
 
     vectors_ori, paths = joblib.load(vectors_ori_path)
 
