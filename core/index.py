@@ -80,7 +80,7 @@ if __name__ == '__main__':
     model = get_model(args.model).to(device)
     slice_num = 100000
 
-    pca_path = args.id + "_"+str(args.vector_len)+"pca.pkl"
+    pca_path = args.id + "_" + str(args.vector_len) + "pca.pkl"
     vectors_path = args.id + "vectors.pkl"
     vectors_ori_path = args.id + "vectors_ori.pkl"
     # for i in range(math.ceil(args.num / slice_num)):
@@ -104,7 +104,8 @@ if __name__ == '__main__':
             pca = joblib.load(pca_path)
         else:
             pca = PCA(args.vector_len, whiten=True)
-            pca.fit(np.random.choice(vectors_ori,20000))
+            ids = np.random.choice(len(vectors_ori), 20000)
+            pca.fit(vectors_ori[ids])
         vectors = pca.transform(vectors_ori)
 
         joblib.dump(pca, pca_path)
