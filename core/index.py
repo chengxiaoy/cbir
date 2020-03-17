@@ -37,6 +37,7 @@ parser.add_argument("--model", '-m', default='resnet50', required=False,
 parser.add_argument("--pca", '-p', action='store_false', help="need pca")
 parser.add_argument("--multi_scale", '-s', action='store_true')
 parser.add_argument("--rerank", '-k', default='none')
+parser.add_argument("--vector_len", '-l', default=512, type=int)
 
 parser.add_argument('--id', '-i', default="5")
 
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     model = get_model(args.model).to(device)
     slice_num = 100000
 
-    pca_path = args.id + "pca.pkl"
+    pca_path = args.id + "_"+str(args.vector_len)+"pca.pkl"
     vectors_path = args.id + "vectors.pkl"
     vectors_ori_path = args.id + "vectors_ori.pkl"
     for i in range(math.ceil(args.num / slice_num)):
@@ -102,7 +103,7 @@ if __name__ == '__main__':
         if os.path.exists(pca_path):
             pca = joblib.load(pca_path)
         else:
-            pca = PCA(512, whiten=True)
+            pca = PCA(args.vector_len, whiten=True)
             pca.fit(vectors_ori[:50000])
         vectors = pca.transform(vectors_ori)
 
@@ -132,5 +133,3 @@ if __name__ == '__main__':
 # 16 resnet50 +  rpool + mac + sum + ms + + pca + 100W
 # 17 attention + pca + 100W + 5wpca
 # 18 resnet50 +  rpool + mac + sum + ms + + 5Wpca + 100W
-
-
