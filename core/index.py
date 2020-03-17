@@ -104,7 +104,7 @@ if __name__ == '__main__':
             pca = joblib.load(pca_path)
         else:
             pca = PCA(args.vector_len, whiten=True)
-            pca.fit(vectors_ori[:50000])
+            pca.fit(vectors_ori[:100000])
         vectors = pca.transform(vectors_ori)
 
         joblib.dump(pca, pca_path)
